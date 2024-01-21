@@ -1,0 +1,22 @@
+body {
+  background-color: #fbe3e8;
+  font-family: Century Gothic;
+  margin-bottom: 75px;
+}
+
+/* Navigation Bar Related */
+
+.svg {
+  width: 34px;
+  height: 24px;
+}
+/* Changes the color of the SVG Icon/Logo */
+.filter-white {
+  filter: invert(100%) sepia(1%) saturate(7494%) hue-rotate(67deg)
+    brightness(107%) contrast(99%);
+}
+
+/* Footer Bar Related */
+.footer nav {
+  background-color: #f9ebee;
+}
