@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureFlow Analyzer</title>
+
+    <!-- Loading CSS -->
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static '/boot/css/bootstrap.min.css' %}" />
+    <!-- my CSS -->
+    <link
+      rel="stylesheet"
+      href="{% static 'analyzer/css/style.css' %}"
+      type="text/css"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      class="filter-white"
+      href="{% static 'svgIcons/shield-check.svg' %}"
+    />
+  </head>
+  <!--Navigation Bar-->
+  <nav
+    nav
+    class="navbar bg-dark border-bottom border-body"
+    data-bs-theme="dark"
+  >
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'index' %}">
+        <img
+          src="{% static 'svgIcons/shield-check.svg' %}"
+          alt="Logo"
+          width="30"
+          height="24"
+          class="d-inline-block align-text-top filter-white"
+        />
+        SecureFlow Analyzer
+      </a>
+    </div>
+  </nav>
+  <body>
+    {% block body %} {% endblock %}
+    <!--Footer-->
+    <div class="container footer">
+      <nav class="navbar fixed-bottom navbar-expand-md footer">
+        <!--Company Copyright-->
+        <p class="col-md-4 mb-0 text-muted">© 2024 SecureFlow Analyzer, Inc</p>
+        <!--Footer Logo-->
+        <a
+          href="{% url 'index' %}"
+          class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none"
+        >
+          <img
+            src="{% static 'svgIcons/shield-check.svg' %}"
+            alt="calendar"
+            class="d-inline-block align-text-top svg"
+          />
+        </a>
+        <!--Footer Items-->
+        <ul class="nav col-md-4 justify-content-end">
+          <li class="nav-item"
+            ><a
+              href="https://github.com/JasonGri"
+              class="nav-link px-2 text-muted"
+              ><img
+                src="{% static 'svgIcons/github.svg' %}"
+                class="svg"
+              />Github</a
+            >
+          </li>
+          <li class="nav-item"
+            ><a
+              href="https://www.linkedin.com/in/jason-grivas-b94b7b212/"
+              class="nav-link px-2 text-muted"
+              ><img
+                src="{% static 'svgIcons/linkedin.svg' %}"
+                class="svg"
+              />LinkedIn</a
+            ></li
+          >
+        </ul>
+      </nav>
+    </div>
+    <!-- Loading JavaScript -->
+    <!-- Bootstrap JS -->
+    <script src="{% static 'boot/js/bootstrap.min.js' %}"></script>
+    <!-- my JS script -->
+    <script src="{% static 'analyzer/js/script.js' %}"></script>
+  </body>
+</html>
