@@ -11,10 +11,17 @@ from collections import Counter
 def get_capture(file_path):
     return rdpcap(file_path)
 
-'''
-    Returns a dictionary with keys and values as PROTOCOLS utilized and OCCURENCES of each respectively.
-'''
+#--------------------PROTOCOL DISTRIBUTION---------------------
 def get_protocols(capture):
+    '''
+    This is a docstring for get_protocols.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    Returns a dictionary with keys and values as PROTOCOLS utilized and OCCURENCES of each respectively.
+    '''
     proto_nums = {
         1: "ICMP",
         0: "IP",
@@ -68,3 +75,14 @@ def get_protocols(capture):
     # Count the occurrences of each protocol in the list
     proto_counter.update(proto_list)
     return dict(proto_counter)
+
+#--------------------BANDWIDTH UTILIZATION---------------------
+
+#--------------------CONVERSATIONS---------------------
+    # IPs Communicating
+    # Bytes + Packets  Exchanged
+    # Duration of communication
+
+#--------------------IP GEOLOCATION MAPPING---------------------
+
+#--------------------TCP Stream---------------------
