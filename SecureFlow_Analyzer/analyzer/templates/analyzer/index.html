@@ -1,4 +1,24 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
 <h1 class="text-center">Welcome to SecureFlow Analyzer!</h1>
 
+<div class="container mt-5">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- Choose a file -->
+    <div class="mb-3">
+      <label for="{{form.pcap_file.id_for_label}}" class="form-label"
+        >{{form.pcap_file.label}}</label
+      >
+      <input
+        type="file"
+        name="{{ form.pcap_file.name }}"
+        class="form-control"
+        id="{{ form.pcap_file.id_for_label }}"
+      />
+    </div>
+    <div class="d-grid gap-2 col-6 mx-auto">
+      <button type="submit" class="btn btn-dark">Upload</button>
+    </div>
+  </form>
+</div>
 {% endblock %}
