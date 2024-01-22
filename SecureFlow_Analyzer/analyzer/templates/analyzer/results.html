@@ -1,3 +1,21 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
-<h1>Analysis Complete!</h1>
+<h1 class="text-center">Analysis Complete!</h1>
+<div class="d-grid gap-2 col-6 mx-auto">
+  <a class="btn btn-dark" href="{% url 'analyzer:analysis' %}" role="button"
+    ><img
+      src="{% static 'svgIcons/pie-chart-fill.svg' %}"
+      class="svg filter-white"
+    />
+    View Analysis</a
+  >
+
+  <a class="btn btn-dark" href="{% url 'analyzer:anomaly' %}" role="button"
+    ><img
+      src="{% static 'svgIcons/exclamation-triangle.svg' %}"
+      class="svg filter-white"
+    />
+    View Anomalies</a
+  >
+</div>
+
 {% endblock %}

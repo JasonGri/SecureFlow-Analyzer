@@ -22,3 +22,9 @@ def index(req):
 
 def results(req):
     return render(req, "analyzer/results.html")
+
+def analysis(req):
+    return render(req, "analyzer/analysis.html")
+
+def anomaly(req):
+    return render(req, "analyzer/anomaly.html")
