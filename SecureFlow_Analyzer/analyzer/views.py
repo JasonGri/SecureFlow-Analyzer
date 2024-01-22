@@ -19,15 +19,19 @@ def index(req):
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 future = executor.submit(get_capture, file_path)
                 capture = future.result()
-            
-            context = {
-                'analysis':{},
-                'anomaly':{}
-            }
+        
 
             #TODO: Run analysis and assign results to context
-            
+            protocols = get_protocols(capture)
+
             #TODO: Run anomaly detection and assign results to context
+
+            context = {
+                'analysis':{
+                    'protocols': protocols
+                },
+                'anomaly':{}
+            }
 
             #Sets context in session for transfer to other views
             req.session['context'] = context
