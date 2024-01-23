@@ -18,7 +18,19 @@
       />
     </div>
     <div class="d-grid gap-2 col-6 mx-auto">
-      <button type="submit" class="btn btn-dark">Upload</button>
+      <button id="upload-btn" class="btn btn-dark" type="submit">Upload</button>
+      <button
+        id="upload-btn-loading"
+        class="btn btn-dark visually-hidden"
+        type="button"
+        disabled
+      >
+        <span
+          class="spinner-border spinner-border-sm"
+          aria-hidden="true"
+        ></span>
+        <span role="status">Uploading...</span>
+      </button>
     </div>
   </form>
 </div>
