@@ -20,7 +20,7 @@ def get_protocols(capture):
     - capture: The Scapy's PacketList obj from the uploaded PCAP file.
 
     Returns:
-    Returns a dictionary with keys and values as PROTOCOLS utilized and OCCURENCES of each respectively.
+    A dictionary with keys and values as PROTOCOLS utilized and OCCURENCES of each respectively.
     '''
     proto_nums = {
         1: "ICMP",
@@ -82,6 +82,65 @@ def get_protocols(capture):
     # IPs Communicating
     # Bytes + Packets  Exchanged
     # Duration of communication
+def get_convos(capture):
+    '''
+    This is a docstring for extract_ip_conv_pairs.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    {   
+        1:{
+            pair: (IP, IP),
+            packets: int,
+            bytes: int,
+            duration: float
+        },
+        2:{...},
+        ...
+    }
+    '''
+
+    conversations = {}
+
+    for packet in capture:
+        if IP in packet:
+            src_ip = packet[IP].src
+            dst_ip = packet[IP].dst
+            payload_bytes = len(packet)
+            timestamp = float(packet.time)
+
+            # Ensure the pair is unique by sorting the IPs
+            ip_pair = tuple(sorted([src_ip, dst_ip]))
+            
+            # Add 1st conversation
+            if len(conversations) == 0:
+                conversations[0] = {
+                        'pair': ip_pair,
+                        'packets': 1,
+                        'bytes': payload_bytes,
+                        'start_time': timestamp,
+                        'end_time': timestamp
+                    }
+            else:    
+                # Update or initialize attributes
+                for k, v in conversations.items():
+                    if v['pair'] == ip_pair:
+                        v['packets'] += 1
+                        v['bytes'] += payload_bytes
+                        v['end_time'] = timestamp
+                        break
+                else:
+                    conversations[max(conversations.keys())+1] = {
+                        'pair': ip_pair,
+                        'packets': 1,
+                        'bytes': payload_bytes,
+                        'start_time': timestamp,
+                        'end_time': timestamp
+                    }
+
+    return conversations
 
 #--------------------IP GEOLOCATION MAPPING---------------------
 
