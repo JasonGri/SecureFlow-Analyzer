@@ -1,28 +1,64 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
-<h1 class="text-center"
+<h1 class="text-center p-4"
   >These are the Network Traffic Analysis Observations:</h1
 >
 <div class="container-fluid">
   <!-- 1st Headings Row -->
   <div class="row">
     <div class="col-8">
-      <h2 class="text-center">Protocol Distribution</h2>
+      <h2 class="text-center p-2">Protocol Distribution</h2>
     </div>
-    <div class="col"> <h2 class="text-center">Bandwidth Utilization</h2> </div>
+    <div class="col">
+      <h2 class="text-center p-2">Bandwidth Utilization</h2>
+    </div>
   </div>
   <!-- 1st Charts Row -->
   <div class="row">
     <div class="col">
-      <img class="img-fluid" src="../../../media/images/proto_dirb_bar.png" />
+      <figure class="figure">
+        <img
+          src="../../../media/images/proto_dirb_bar.png"
+          class="figure-img img-fluid rounded shadow"
+          alt="..."
+        />
+        <figcaption class="figure-caption text-center"
+          ><em
+            ><u>Bar</u> chart dipicting number of occurences per protocol.</em
+          ></figcaption
+        >
+      </figure>
     </div>
     <div class="col">
-      <img class="img-fluid" src="../../../media/images/proto_dirb_pie.png" />
+      <figure class="figure">
+        <img
+          src="../../../media/images/proto_dirb_pie.png"
+          class="figure-img img-fluid rounded shadow"
+          alt="..."
+        />
+        <figcaption class="figure-caption text-center"
+          ><em
+            ><u>Pie</u> chart dipicting number of occurences per protocol.</em
+          ></figcaption
+        >
+      </figure>
     </div>
-    <div class="col"> <img class="img-fluid" src="#" /> </div>
+    <div class="vr p-0"></div>
+    <div class="col"
+      ><figure class="figure">
+        <img src="#" class="figure-img img-fluid rounded shadow" alt="..." />
+        <figcaption class="figure-caption text-center"
+          ><em
+            ><u>Horizontal histogram</u> dipicting utilization of bandwidth per
+            host.</em
+          ></figcaption
+        >
+      </figure>
+    </div>
   </div>
+  <hr class="my-5" />
   <!-- 2nd Headings Row -->
   <div class="row">
-    <h2 class="text-center">Conversations</h2>
+    <h2 class="text-center p-2">Conversations</h2>
     {{conversations}}
   </div>
   <!-- Conversations Image Row -->
@@ -33,8 +69,10 @@
   <div class="row">
     <div class="col"> </div>
   </div>
+  <hr class="my-5" />
   <!-- IP Geolocation Mapping Row -->
   <div class="row"> </div>
+  <hr class="my-5" />
   <!-- TCP Stream Row -->
   <div class="row"> </div>
 </div>
