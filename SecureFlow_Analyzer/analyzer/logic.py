@@ -1,11 +1,16 @@
 '''
 Here is where the logic will be placed, in more detail the functions analyzing the pcap file and returning their results.
 '''
+from django.conf import settings
 # Scapy
 from scapy.all import *
 from scapy.layers.inet import *
 
 from collections import Counter
+
+# Plotting
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def get_capture(file_path):
@@ -75,6 +80,39 @@ def get_protocols(capture):
     # Count the occurrences of each protocol in the list
     proto_counter.update(proto_list)
     return dict(proto_counter)
+
+def visualize_protocols(proto_dict):
+
+    data = pd.DataFrame(list(proto_dict.items()), columns=['protocol', 'occurrence'])
+    
+    colors = ['blue', 'green', 'orange', 'red']
+        
+    # BAR GRAPH
+    fig1, ax1 = plt.subplots()
+
+    data.plot.bar(x='protocol', y='occurrence', color=colors, legend=False, ax=ax1)
+
+    ax1.set_yscale('log')
+
+    ax1.set_xlabel('Protocol')
+    ax1.set_ylabel('Number of Occurrences')
+    ax1.set_title('Bar Chart')
+    ax1.tick_params(axis='x', rotation=45)
+   
+    plt.tight_layout()
+    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/proto_dirb_bar.png'))
+
+    # PIE PLOT
+    fig2, ax2 = plt.subplots()
+
+    #FIXME: Utilize explode for better representation
+    # explode = (0, 0.1, 0, 0)
+
+    ax2.pie(data['occurrence'], labels=data['protocol'], colors=colors, autopct='%1.1f%%', startangle=90)
+    ax2.set_title('Pie Chart')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/proto_dirb_pie.png'))
 
 #--------------------BANDWIDTH UTILIZATION---------------------
 
