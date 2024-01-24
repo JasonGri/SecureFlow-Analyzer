@@ -85,7 +85,7 @@ def visualize_protocols(proto_dict):
 
     data = pd.DataFrame(list(proto_dict.items()), columns=['protocol', 'occurrence'])
     
-    colors = ['blue', 'green', 'orange', 'red']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         
     # BAR GRAPH
     fig1, ax1 = plt.subplots()
@@ -115,6 +115,61 @@ def visualize_protocols(proto_dict):
     plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/proto_dirb_pie.png'))
 
 #--------------------BANDWIDTH UTILIZATION---------------------
+def get_top_talkers(capture):
+    '''
+    This is a docstring for top_talkers.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    A dictionary with keys as IP ADDRESS where BYTES originated from as values.
+    '''
+    traffic = Counter()
+
+    for pkt in capture:
+        if IP in pkt:
+            ip_layer = pkt[IP]
+            src_ip = ip_layer.src
+            payload = ip_layer.len
+
+            traffic.update({src_ip: payload})
+    
+    # Convert Counter to dictionary
+    traffic = dict(traffic)
+
+    # Sort based on num of bytes
+    sorted_traffic = dict(sorted(traffic.items(), key=lambda x: x[1], reverse=True))
+
+    # Get the 10 IPs with most communication traffic, and sort it from least to most
+    top_ten = dict(list(sorted_traffic.items())[:10][::-1])
+    
+    return top_ten
+
+def visualize_top_talkers(band_dict):
+
+    data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
+    print(data)
+
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+
+    fig, ax = plt.subplots()
+
+    ax.barh(data['IP'], data['Bytes'], color=colors)
+
+    ax.set_xlabel('Bytes')
+    ax.set_xscale('log')
+    byte_ticks = [1, 1e3, 1e6, 1e9, 1e12]
+    byte_labels = ['1B', '1KB', '1MB', '1GB', '1TB']
+
+    ax.set_xticks(byte_ticks)
+    ax.set_xticklabels(byte_labels)
+
+    ax.set_ylabel('IP Addresses')
+    ax.set_title('Horizontal Bar Chart')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_hbar.png'))
 
 #--------------------CONVERSATIONS---------------------
     # IPs Communicating

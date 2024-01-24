@@ -24,8 +24,10 @@ def index(req):
             #TODO: Run analysis and assign results to context
             protocols = get_protocols(capture)
             convos = get_convos(capture)
+            top_talkers = get_top_talkers(capture)
 
             visualize_protocols(protocols)
+            visualize_top_talkers(top_talkers)
 
             #TODO: Run anomaly detection and assign results to context
 
