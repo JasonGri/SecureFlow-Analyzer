@@ -171,6 +171,41 @@ def visualize_top_talkers(band_dict):
     plt.tight_layout()
     plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_hbar.png'))
 
+def bandwidth_timeseries(capture):
+    
+    # Extract bytes per time instance
+    traffic = Counter()
+    for pkt in capture:
+        if IP in pkt:
+            ip_layer = pkt[IP]
+
+            payload = ip_layer.len
+            timestamp = float(ip_layer.time)
+
+            traffic.update({datetime.fromtimestamp(timestamp):payload})
+    
+    traffic = dict(traffic)
+
+    # Plotting the timeseries chart
+    data = pd.DataFrame(list(traffic.items()), columns=['Date', 'Bytes'])
+    data['Date'] = pd.to_datetime(data['Date'])
+
+
+    fig, ax = plt.subplots()
+    ax.plot(data['Date'], data['Bytes'], marker='o')
+
+    # FIXME: Maybe consider changing the white background color    
+    # fig.set_facecolor('#adb5bd')
+    # ax.set_facecolor('#adb5bd')
+
+    ax.set_xlabel('Date')
+    ax.tick_params(axis='x', rotation=45)
+    ax.set_ylabel('Bytes')
+    ax.set_title('Time Series Chart')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_tseries.png'))
+
 #--------------------CONVERSATIONS---------------------
     # IPs Communicating
     # Bytes + Packets  Exchanged

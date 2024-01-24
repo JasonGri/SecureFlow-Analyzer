@@ -28,6 +28,7 @@ def index(req):
 
             visualize_protocols(protocols)
             visualize_top_talkers(top_talkers)
+            bandwidth_timeseries(capture)
 
             #TODO: Run anomaly detection and assign results to context
 
