@@ -2,6 +2,8 @@
 Here is where the logic will be placed, in more detail the functions analyzing the pcap file and returning their results.
 '''
 from django.conf import settings
+from .constants import *
+
 # Scapy
 from scapy.all import *
 from scapy.layers.inet import *
@@ -27,42 +29,7 @@ def get_protocols(capture):
     Returns:
     A dictionary with keys and values as PROTOCOLS utilized and OCCURENCES of each respectively.
     '''
-    proto_nums = {
-        1: "ICMP",
-        0: "IP",
-        2: "IGMP",
-        4: "IPIP",
-        6: "TCP",
-        8: "EGP",
-        9: "IGP",
-        17: "UDP",
-        58: "IPv6-ICMP",
-        41: "IPv6",
-        43: "IPv6-Route",
-        44: "IPv6-Frag",
-        47: "GRE",
-        50: "ESP",
-        51: "AH",
-        58: "IPv6-ICMP",
-        88: "EIGRP",
-        89: "OSPFIGP",
-        94: "IPIP",
-        97: "EtherIP",
-        103: "PIM",
-        112: "VRRP",
-        115: "L2TP",
-        118: "STP",
-        121: "SMP",
-        124: "PIPE",
-        132: "SCTP",
-        133: "FC",
-        137: "MPLS",
-        138: "MPLS-MCAST",
-        139: "UDPLite",
-        140: "MPLS-UDPLite",
-        142: "MP",
-        254: "RAW"
-    }
+    proto_nums = PROTOCOL_NUMS
 
     proto_counter = Counter()
     proto_list = []
@@ -85,7 +52,7 @@ def visualize_protocols(proto_dict):
 
     data = pd.DataFrame(list(proto_dict.items()), columns=['protocol', 'occurrence'])
     
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    colors = CHART_COLORS
         
     # BAR GRAPH
     fig1, ax1 = plt.subplots()
@@ -156,7 +123,7 @@ def visualize_top_talkers(band_dict):
     data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
     print(data)
 
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    colors = CHART_COLORS
 
     fig, ax = plt.subplots()
 
@@ -240,43 +207,7 @@ def get_convos(capture):
     }
     '''
 
-    proto_nums = {
-        1: "ICMP",
-        0: "IP",
-        2: "IGMP",
-        4: "IPIP",
-        6: "TCP",
-        8: "EGP",
-        9: "IGP",
-        17: "UDP",
-        58: "IPv6-ICMP",
-        41: "IPv6",
-        43: "IPv6-Route",
-        44: "IPv6-Frag",
-        47: "GRE",
-        50: "ESP",
-        51: "AH",
-        58: "IPv6-ICMP",
-        88: "EIGRP",
-        89: "OSPFIGP",
-        94: "IPIP",
-        97: "EtherIP",
-        103: "PIM",
-        112: "VRRP",
-        115: "L2TP",
-        118: "STP",
-        121: "SMP",
-        124: "PIPE",
-        132: "SCTP",
-        133: "FC",
-        137: "MPLS",
-        138: "MPLS-MCAST",
-        139: "UDPLite",
-        140: "MPLS-UDPLite",
-        142: "MP",
-        254: "RAW"
-    }
-
+    proto_nums = PROTOCOL_NUMS
     conversations = {}
 
     for packet in capture:
