@@ -14,6 +14,38 @@ from collections import Counter
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from hurry.filesize import size, alternative
+
+from datetime import datetime
+
+#TODO: Maybe add seperate file for these functions
+# -------------------------GENERAL FUNCTIONS-------------------------
+def format_duration(duration):
+    '''
+    This is a docstring for format_duration.
+
+    Parameters:
+    - duration: An integer representing milliseconds.
+
+    Returns:
+    A a String with the ms formatted with the appropriate time unit. 
+    '''
+    ms =  1e3
+    sec = 60 * ms
+    min = 60 * sec
+    hour = 60 * min
+
+    if duration < sec:
+        dur_str = f"{duration:.2f} ms"
+    elif duration < min:
+        dur_str = f"{duration / sec:.2f} sec"
+    elif duration < hour:
+        dur_str = f"{duration / min:.2f} min"
+    else:
+        dur_str = f"{duration / hour:.2f} h"
+
+    return dur_str
+
 
 def get_capture(file_path):
     return rdpcap(file_path)
@@ -181,9 +213,6 @@ def bandwidth_timeseries(capture):
     plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_tseries.png'))
 
 #--------------------CONVERSATIONS---------------------
-    # IPs Communicating
-    # Bytes + Packets  Exchanged
-    # Duration of communication
 def get_convos(capture):
     '''
     This is a docstring for get_convos.
@@ -195,6 +224,10 @@ def get_convos(capture):
     {   
         1:{
             socket_pair: (IP:port, IP:port),
+            src_ip: str,
+            dst_ip: str,
+            src_port: int,
+            dst_port: int, 
             packets: int,
             bytes: int,
             proto: str,
@@ -239,6 +272,10 @@ def get_convos(capture):
             if len(conversations) == 0:
                 conversations[0] = {
                         'pair': socket_pair,
+                        'src_ip': src_ip,
+                        'dst_ip': dst_ip,
+                        'src_port': src_port,
+                        'dst_port': dst_port, 
                         'packets': 1,
                         'bytes': payload_bytes,
                         'proto': protocol,
@@ -256,6 +293,10 @@ def get_convos(capture):
                 else:
                     conversations[max(conversations.keys())+1] = {
                         'pair': socket_pair,
+                        'src_ip': src_ip,
+                        'dst_ip': dst_ip,
+                        'src_port': src_port,
+                        'dst_port': dst_port, 
                         'packets': 1,
                         'bytes': payload_bytes,
                         'proto': protocol,
@@ -263,10 +304,13 @@ def get_convos(capture):
                         'end_time': timestamp
                     }
 
-     # Add duration in milliseconds for each conversation
     for k, convo in conversations.items():
-        duration = round((convo['end_time'] - convo['start_time']) * 1000, 3)
-        convo['duration'] = duration 
+        # Convert duration to milliseconds and format it for each conversation    
+        duration = (convo['end_time'] - convo['start_time']) * 1000
+        convo['duration'] = format_duration(duration)
+        # Format the bytes nicely
+        convo['bytes'] = size(convo['bytes'], system=alternative)
+
 
     return conversations
 

@@ -116,12 +116,12 @@
             {% for k, conv in conversations.items %}
             <tr class="table-light">
               <th scope="row">{{k}}</th>
-              <td>{{conv.pair.0}}</td>
-              <td>{{conv.pair.1}}</td>
+              <td>{{conv.src_ip}}:<strong>{{conv.src_port}}</strong></td>
+              <td>{{conv.dst_ip}}:<strong>{{conv.dst_port}}</strong></td>
               <td>{{conv.proto}}</td>
               <td>{{conv.packets}}</td>
               <td>{{conv.bytes}}</td>
-              <td>{{conv.duration}} ms</td>
+              <td>{{conv.duration}}</td>
             </tr>
             {% endfor %}
           </tbody>
