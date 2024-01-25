@@ -88,7 +88,6 @@
   <!-- 3rd Headings Row -->
   <div class="row">
     <h2 class="text-center p-2">Conversations</h2>
-    {{conversations}}
   </div>
   <!-- Conversations Image Row -->
   <div class="row">
@@ -96,7 +95,39 @@
   </div>
   <!-- Conversations Details Row -->
   <div class="row">
-    <div class="col"> </div>
+    <div class="col px-5">
+      <div class="table-container">
+        <table
+          id="conversations-table"
+          class="table table-dark table-container"
+        >
+          <thead class="sticky-top">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Source</th>
+              <th scope="col">Destination</th>
+              <th scope="col">Protocol</th>
+              <th scope="col">Packets</th>
+              <th scope="col">Bytes</th>
+              <th scope="col">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for k, conv in conversations.items %}
+            <tr class="table-light">
+              <th scope="row">{{k}}</th>
+              <td>{{conv.pair.0}}</td>
+              <td>{{conv.pair.1}}</td>
+              <td>{{conv.proto}}</td>
+              <td>{{conv.packets}}</td>
+              <td>{{conv.bytes}}</td>
+              <td>{{conv.duration}} ms</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table></div
+      >
+    </div>
   </div>
   <hr class="my-5" />
   <!-- IP Geolocation Mapping Row -->

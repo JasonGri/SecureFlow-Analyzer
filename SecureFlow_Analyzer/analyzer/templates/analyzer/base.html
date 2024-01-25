@@ -7,6 +7,11 @@
     <title>SecureFlow Analyzer</title>
 
     <!-- Loading CSS -->
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="{% static '/DataTables/css/jquery.dataTables.min.css' %}"
+    />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{% static '/boot/css/bootstrap.min.css' %}" />
     <!-- my CSS -->
@@ -87,7 +92,11 @@
     <!-- Loading JavaScript -->
     <!-- Bootstrap JS -->
     <script src="{% static 'boot/js/bootstrap.min.js' %}"></script>
-    <!-- my JS script -->
+    <!-- jQuery -->
+    <script src="{%static 'jQuery/js/jquery-3.7.0.min.js'%}"></script>
+    <!-- DataTables -->
+    <script src="{%static 'DataTables/js/jquery.dataTables.min.js'%}"></script>
+    <!-- My JS Script -->
     <script src="{% static 'analyzer/js/script.js' %}"></script>
   </body>
 </html>

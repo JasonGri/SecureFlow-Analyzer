@@ -10,3 +10,7 @@ if (uploadBtn) {
     uploadBtnLoading.classList.remove("visually-hidden");
   });
 }
+
+// Shorting of Conversations Table
+//FIXME: Shorting not workign properly
+new DataTable("#conversations-table");
