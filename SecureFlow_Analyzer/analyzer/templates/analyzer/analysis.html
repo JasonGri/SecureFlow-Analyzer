@@ -52,19 +52,6 @@
           bytes transferred.</em
         ></figcaption
       >
-      <!-- <figure class="figure">
-        <img
-          src="../../../media/images/band_util_hbar.png"
-          class="figure-img img-fluid rounded shadow"
-          alt="..."
-        />
-        <figcaption class="figure-caption text-center"
-          ><em
-            ><u>Horizontal histogram</u> depicting the top 10 IP addresses by
-            bytes transferred.</em
-          ></figcaption
-        >
-      </figure> -->
     </div>
   </div>
   <hr class="my-5" />
@@ -76,7 +63,18 @@
   <div class="row">
     <div class="col-3"></div>
     <div class="col-6 text-center">
-      <figure class="figure">
+      <div class="shadow">
+        {% if band_util_tseries %} {{ band_util_tseries|safe }} {% else %}
+        <p>No graph was provided.</p>
+        {% endif %}
+      </div>
+      <figcaption class="figure-caption text-center"
+        ><em
+          ><u>Timeseries chart</u> depicting the overall bandwidth utilization
+          per time instance.</em
+        ></figcaption
+      >
+      <!-- <figure class="figure">
         <img
           src="../../../media/images/band_util_tseries.png"
           class="figure-img img-fluid rounded shadow"
@@ -88,7 +86,7 @@
             per time instance.</em
           ></figcaption
         >
-      </figure>
+      </figure> -->
     </div>
     <div class="col-3"></div>
   </div>

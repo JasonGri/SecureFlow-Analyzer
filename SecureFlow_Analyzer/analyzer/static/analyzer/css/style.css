@@ -1,10 +1,20 @@
+/* HEX Codes:
+#EDF4F2, #7C8363, #31473A
+#f9ebee, #fbe3e8, boot-dark 
+#CADCFC, #8AB6F9, #00246B
+#DDDBDE, #CAD4DF, #656E77, #3B373B
+#6372FA, #d5dbff, #4252a3*/
+
 body {
-  background-color: #fbe3e8;
+  background-color: #d5dbff;
   font-family: Century Gothic;
   margin-bottom: 75px;
 }
 
 /* Navigation Bar Related */
+.navbar-custom {
+  background-color: #4252a3;
+}
 
 .svg {
   width: 34px;
@@ -18,7 +28,7 @@ body {
 
 /* Footer Bar Related */
 .footer nav {
-  background-color: #f9ebee;
+  background-color: #c1c8f9;
 }
 
 /* Conversations Table */

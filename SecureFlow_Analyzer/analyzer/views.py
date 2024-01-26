@@ -28,7 +28,7 @@ def index(req):
 
             proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
             band_util_hbar = visualize_top_talkers(top_talkers)
-            bandwidth_timeseries(capture)
+            band_util_tseries = bandwidth_timeseries(capture)
 
             #TODO: Run anomaly detection and assign results to context
 
@@ -38,6 +38,7 @@ def index(req):
                     'proto_graph_bar': proto_graph_bar,
                     'proto_graph_pie': proto_graph_pie,
                     'band_util_hbar': band_util_hbar,
+                    'band_util_tseries': band_util_tseries,
                     'conversations': convos
                 },
                 'anomaly':{}

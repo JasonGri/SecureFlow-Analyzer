@@ -91,7 +91,7 @@ def visualize_protocols(proto_dict):
     fig1.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
     # Plot Pie Chart
-    fig2 = px.pie(data, values='Occurrences', names='Protocols' ,color='Protocols')
+    fig2 = px.pie(data, values='Occurrences', names='Protocols', color='Protocols')
 
     fig2.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
@@ -131,22 +131,13 @@ def get_top_talkers(capture):
 
 def visualize_top_talkers(band_dict):
 
-    byte_ticks = [1, 1e3, 1e6, 1e9, 1e12]
-    byte_labels = ['1B', '1KB', '1MB', '1GB', '1TB']
-
     data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
     print(data)
 
     # Plot Horizontal Bar Chart
-    fig = px.bar(data, x=data['Bytes'], y=data['IP'], orientation='h') 
+    fig = px.bar(data, x=data['Bytes'], y=data['IP'], orientation='h', color='IP') 
 
-    #FIXME: Do smth for the visual 
-    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(
-        tickmode='array',
-        tickvals=byte_ticks,
-        ticktext=byte_labels,
-        title='Bytes'
-    ))
+    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
     return fig.to_html()
 
@@ -169,20 +160,11 @@ def bandwidth_timeseries(capture):
     data = pd.DataFrame(list(traffic.items()), columns=['Date', 'Bytes'])
     data['Date'] = pd.to_datetime(data['Date'])
 
+    fig = px.line(data, x=data['Date'], y=data['Bytes'], markers='o')
 
-    fig, ax = plt.subplots()
-    ax.plot(data['Date'], data['Bytes'], marker='o')
- 
-    fig.set_facecolor('#f8f9fa')
-    ax.set_facecolor('#f8f9fa')
+    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
-    ax.set_xlabel('Date')
-    ax.tick_params(axis='x', rotation=45)
-    ax.set_ylabel('Bytes')
-    ax.set_title('Time Series Chart')
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_tseries.png'))
+    return fig.to_html()
 
 #--------------------CONVERSATIONS---------------------
 def get_convos(capture):
