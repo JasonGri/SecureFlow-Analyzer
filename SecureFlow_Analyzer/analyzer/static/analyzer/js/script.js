@@ -14,3 +14,6 @@ if (uploadBtn) {
 // Shorting of Conversations Table
 //FIXME: Shorting not workign properly
 new DataTable("#conversations-table");
+
+// Chart surrounding space
+//TODO: Make it round

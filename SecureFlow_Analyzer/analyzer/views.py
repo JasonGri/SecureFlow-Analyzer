@@ -26,8 +26,8 @@ def index(req):
             convos = get_convos(capture)
             top_talkers = get_top_talkers(capture)
 
-            visualize_protocols(protocols)
-            visualize_top_talkers(top_talkers)
+            proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
+            band_util_hbar = visualize_top_talkers(top_talkers)
             bandwidth_timeseries(capture)
 
             #TODO: Run anomaly detection and assign results to context
@@ -35,6 +35,9 @@ def index(req):
             context = {
                 'analysis':{
                     'protocols': protocols,
+                    'proto_graph_bar': proto_graph_bar,
+                    'proto_graph_pie': proto_graph_pie,
+                    'band_util_hbar': band_util_hbar,
                     'conversations': convos
                 },
                 'anomaly':{}

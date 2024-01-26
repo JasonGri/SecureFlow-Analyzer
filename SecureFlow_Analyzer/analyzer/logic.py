@@ -13,6 +13,7 @@ from collections import Counter
 # Plotting
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 from hurry.filesize import size, alternative
 
@@ -82,41 +83,19 @@ def get_protocols(capture):
 
 def visualize_protocols(proto_dict):
 
-    data = pd.DataFrame(list(proto_dict.items()), columns=['protocol', 'occurrence'])
-    
-    colors = CHART_COLORS
-        
-    # BAR GRAPH
-    fig1, ax1 = plt.subplots()
+    data = pd.DataFrame(list(proto_dict.items()), columns=['Protocols', 'Occurrences'])
 
-    data.plot.bar(x='protocol', y='occurrence', color=colors, legend=False, ax=ax1)
+    # Plot Bar chart
+    fig1 = px.bar(data, x='Protocols', y='Occurrences', color='Protocols', log_y=True)
 
-    fig1.set_facecolor('#f8f9fa')
-    ax1.set_facecolor('#f8f9fa')
-    
-    ax1.set_yscale('log')
+    fig1.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
-    ax1.set_xlabel('Protocol')
-    ax1.set_ylabel('Number of Occurrences')
-    ax1.set_title('Bar Chart')
-    ax1.tick_params(axis='x', rotation=45)
-    plt.tight_layout()
-    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/proto_dirb_bar.png'))
+    # Plot Pie Chart
+    fig2 = px.pie(data, values='Occurrences', names='Protocols' ,color='Protocols')
 
-    # PIE PLOT
-    fig2, ax2 = plt.subplots()
+    fig2.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
 
-    fig2.set_facecolor('#f8f9fa')
-    ax2.set_facecolor('#f8f9fa')
-
-    #FIXME: Utilize explode for better representation
-    # explode = (0, 0.1, 0, 0)
-
-    ax2.pie(data['occurrence'], labels=data['protocol'], colors=colors, autopct='%1.1f%%', startangle=90)
-    ax2.set_title('Pie Chart')
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/proto_dirb_pie.png'))
+    return fig1.to_html(), fig2.to_html()
 
 #--------------------BANDWIDTH UTILIZATION---------------------
 def get_top_talkers(capture):
@@ -152,31 +131,24 @@ def get_top_talkers(capture):
 
 def visualize_top_talkers(band_dict):
 
-    data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
-    print(data)
-
-    colors = CHART_COLORS
-
-    fig, ax = plt.subplots()
-
-    ax.barh(data['IP'], data['Bytes'], color=colors)
-
-    fig.set_facecolor('#f8f9fa')
-    ax.set_facecolor('#f8f9fa')
-
-    ax.set_xlabel('Bytes')
-    ax.set_xscale('log')
     byte_ticks = [1, 1e3, 1e6, 1e9, 1e12]
     byte_labels = ['1B', '1KB', '1MB', '1GB', '1TB']
 
-    ax.set_xticks(byte_ticks)
-    ax.set_xticklabels(byte_labels)
+    data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
+    print(data)
 
-    ax.set_ylabel('IP Addresses')
-    ax.set_title('Horizontal Bar Chart')
+    # Plot Horizontal Bar Chart
+    fig = px.bar(data, x=data['Bytes'], y=data['IP'], orientation='h') 
 
-    plt.tight_layout()
-    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'images/band_util_hbar.png'))
+    #FIXME: Do smth for the visual 
+    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(
+        tickmode='array',
+        tickvals=byte_ticks,
+        ticktext=byte_labels,
+        title='Bytes'
+    ))
+
+    return fig.to_html()
 
 def bandwidth_timeseries(capture):
     
