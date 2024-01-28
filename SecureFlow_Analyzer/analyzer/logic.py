@@ -20,6 +20,7 @@ from hurry.filesize import size, alternative
 from datetime import datetime
 
 #TODO: Maybe add seperate file for these functions
+#FIXME: IT DOES NOT WORK PROPERLY
 # -------------------------GENERAL FUNCTIONS-------------------------
 def format_duration(duration):
     '''
@@ -88,12 +89,12 @@ def visualize_protocols(proto_dict):
     # Plot Bar chart
     fig1 = px.bar(data, x='Protocols', y='Occurrences', color='Protocols', log_y=True)
 
-    fig1.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
+    fig1.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
 
     # Plot Pie Chart
     fig2 = px.pie(data, values='Occurrences', names='Protocols', color='Protocols')
 
-    fig2.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
+    fig2.update_layout(plot_bgcolor=PLOT_BG_COLOR,  paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
 
     return fig1.to_html(), fig2.to_html()
 
@@ -137,7 +138,7 @@ def visualize_top_talkers(band_dict):
     # Plot Horizontal Bar Chart
     fig = px.bar(data, x=data['Bytes'], y=data['IP'], orientation='h', color='IP') 
 
-    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
+    fig.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20), showlegend=False)
 
     return fig.to_html()
 
@@ -162,7 +163,7 @@ def bandwidth_timeseries(capture):
 
     fig = px.line(data, x=data['Date'], y=data['Bytes'], markers='o')
 
-    fig.update_layout(paper_bgcolor='lightgray', margin=dict(l=20, r=20, t=20, b=20))
+    fig.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
 
     return fig.to_html()
 

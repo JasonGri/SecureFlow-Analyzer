@@ -5,15 +5,41 @@
 #DDDBDE, #CAD4DF, #656E77, #3B373B
 #6372FA, #d5dbff, #4252a3*/
 
+:root {
+  /* nav */
+  --nav_bg: #4252a3;
+  --nav_text: #ffffff;
+  /* body */
+  --body_text: #1d2454;
+  --body_bg: #d5dbff;
+  /* footer */
+  --footer_bg: #c1c8f9;
+  --footer_text: #;
+  /* table */
+  --table_head_bg: #4252a3;
+  --table_head_text: #ffffff;
+  --table_body_bg: #cad7ff;
+  --table_border: #aab8ff;
+  /* paginations */
+  --pag_bg: #aab8ff;
+  --pag_text: #1d2454;
+  --pag_pn_bg: #4252a3;
+  --pag_pn_text: #ffffff;
+}
+
 body {
-  background-color: #d5dbff;
+  background-color: var(--body_bg);
+  color: var(--body_text);
   font-family: Century Gothic;
   margin-bottom: 75px;
 }
 
 /* Navigation Bar Related */
 .navbar-custom {
-  background-color: #4252a3;
+  background-color: var(--nav_bg);
+}
+.navbar-custom a {
+  color: var(--nav_text);
 }
 
 .svg {
@@ -28,7 +54,7 @@ body {
 
 /* Footer Bar Related */
 .footer nav {
-  background-color: #c1c8f9;
+  background-color: var(--footer_bg);
 }
 
 /* Conversations Table */
@@ -36,3 +62,31 @@ body {
   max-height: 500px;
   overflow-y: auto;
 } */
+
+#conversations-table thead th {
+  background-color: var(--table_head_bg);
+  color: var(--table_head_text);
+  border-color: var(--table_border);
+}
+
+#conversations-table tbody tr td,
+#conversations-table tbody tr th {
+  background-color: var(--table_body_bg);
+  border-color: var(--table_border);
+}
+
+#conversations-table_paginate .page-link {
+  background-color: var(--pag_bg);
+  color: var(--pag_text);
+}
+#conversations-table_paginate .active .page-link {
+  background-color: var(--pag_pn_bg);
+  border-color: var(--pag_pn_bg);
+  color: var(--pag_pn_text);
+}
+
+.previous .page-link,
+.next .page-link {
+  background-color: var(--pag_pn_bg) !important;
+  color: #ffffff !important;
+}

@@ -36,3 +36,9 @@ PROTOCOL_NUMS = {
     142: "MP",
     254: "RAW"
 }
+
+PAPER_BG_COLOR = '#aab8ff'
+
+PLOT_BG_COLOR = '#cad7ff'
+
+CHART_FONT_COLOR = '#1d2454'
