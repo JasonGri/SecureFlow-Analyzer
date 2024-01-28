@@ -12,42 +12,9 @@ from collections import Counter
 
 # Plotting
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
 
-from hurry.filesize import size, alternative
-
 from datetime import datetime
-
-#TODO: Maybe add seperate file for these functions
-#FIXME: IT DOES NOT WORK PROPERLY
-# -------------------------GENERAL FUNCTIONS-------------------------
-def format_duration(duration):
-    '''
-    This is a docstring for format_duration.
-
-    Parameters:
-    - duration: An integer representing milliseconds.
-
-    Returns:
-    A a String with the ms formatted with the appropriate time unit. 
-    '''
-    ms =  1e3
-    sec = 60 * ms
-    min = 60 * sec
-    hour = 60 * min
-
-    if duration < sec:
-        dur_str = f"{duration:.2f} ms"
-    elif duration < min:
-        dur_str = f"{duration / sec:.2f} sec"
-    elif duration < hour:
-        dur_str = f"{duration / min:.2f} min"
-    else:
-        dur_str = f"{duration / hour:.2f} h"
-
-    return dur_str
-
 
 def get_capture(file_path):
     return rdpcap(file_path)
@@ -260,15 +227,11 @@ def get_convos(capture):
                     }
 
     for k, convo in conversations.items():
-        # Convert duration to milliseconds and format it for each conversation    
-        duration = (convo['end_time'] - convo['start_time']) * 1000
-        convo['duration'] = format_duration(duration)
-        # Format the bytes nicely
-        convo['bytes'] = size(convo['bytes'], system=alternative)
+        # Convert duration to milliseconds    
+        duration = abs(convo['end_time'] - convo['start_time']) * 1000
+        convo['duration'] = duration
 
 
     return conversations
 
 #--------------------IP GEOLOCATION MAPPING---------------------
-
-#--------------------TCP Stream---------------------
