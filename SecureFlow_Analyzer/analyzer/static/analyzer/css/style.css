@@ -92,3 +92,9 @@ body {
 }
 
 /* TODO: Maybe make the left part of the footer bold, change the input color to a lighter shade of the bg color */
+
+/* IP GEOLOCATION MAP */
+#map {
+  height: 500px;
+  border-radius: 10px;
+}
