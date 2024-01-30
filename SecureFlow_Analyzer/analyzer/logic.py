@@ -40,8 +40,8 @@ def get_protocols(capture):
 
     for pkt in capture:
         # Check if packet has IP layer
-        if IP in pkt:
-            ip_layer = pkt[IP]
+        if IP in pkt or IPv6 in pkt:
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
             # Check IP version & append perceeding protocol
             if ip_layer.version == 4:
                 proto_list.append(proto_nums[int(ip_layer.proto)])
@@ -71,7 +71,7 @@ def visualize_protocols(proto_dict):
 #--------------------BANDWIDTH UTILIZATION---------------------
 def get_top_talkers(capture):
     '''
-    This is a docstring for top_talkers.
+    This is a docstring for get_top_talkers.
 
     Parameters:
     - capture: The Scapy's PacketList obj from the uploaded PCAP file.
@@ -82,10 +82,14 @@ def get_top_talkers(capture):
     traffic = Counter()
 
     for pkt in capture:
-        if IP in pkt:
-            ip_layer = pkt[IP]
+        if IP in pkt or IPv6 in pkt:
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
             src_ip = ip_layer.src
-            payload = ip_layer.len
+
+            if ip_layer.version == 4:
+                payload = ip_layer.len  
+            elif ip_layer.version == 6:
+                payload = ip_layer.plen 
 
             traffic.update({src_ip: payload})
     
@@ -125,11 +129,14 @@ def get_traffic(capture):
     # Extract bytes per time instance
     traffic = Counter()
     for pkt in capture:
-        if IP in pkt:
-            ip_layer = pkt[IP]
-
-            payload = ip_layer.len
+        if IP in pkt or IPv6 in pkt:
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
             timestamp = float(ip_layer.time)
+
+            if ip_layer.version == 4:
+                payload = ip_layer.len  
+            elif ip_layer.version == 6:
+                payload = ip_layer.plen 
 
             traffic.update({datetime.fromtimestamp(timestamp):payload})
     
@@ -177,24 +184,25 @@ def get_convos(capture):
     proto_nums = PROTOCOL_NUMS
     conversations = {}
 
-    for packet in capture:
-        if IP in packet:
-            # Gather values
-            ip_layer = packet[IP]
+    for pkt in capture:
+        if IP in pkt or IPv6 in pkt:
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
 
+            # Gather values
             src_ip = ip_layer.src
             dst_ip = ip_layer.dst
-            timestamp = float(packet.time)
-            payload_bytes = ip_layer.len
+            timestamp = float(pkt.time)
 
             if ip_layer.version == 4:
-                protocol = proto_nums[int(ip_layer.proto)] 
+                protocol = proto_nums[int(ip_layer.proto)]
+                payload_bytes = ip_layer.len 
             elif ip_layer.version == 6:
                 protocol = proto_nums[int(ip_layer.nh)]
+                payload_bytes = ip_layer.plen
 
-            if packet.haslayer(UDP) or packet.haslayer(TCP):
-                src_port = packet.sport
-                dst_port = packet.dport
+            if pkt.haslayer(UDP) or pkt.haslayer(TCP):
+                src_port = pkt.sport
+                dst_port = pkt.dport
 
             # Direction doesn't matter 
             # socket_pair = tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"]))
