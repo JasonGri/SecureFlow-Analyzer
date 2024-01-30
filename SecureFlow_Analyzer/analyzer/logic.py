@@ -7,6 +7,7 @@ from .constants import *
 # Scapy
 from scapy.all import *
 from scapy.layers.inet import *
+from scapy.layers.inet6 import *
 
 from collections import Counter
 
@@ -15,6 +16,8 @@ import pandas as pd
 import plotly.express as px
 
 from datetime import datetime
+import os
+import ipinfo
 
 def get_capture(file_path):
     return rdpcap(file_path)
@@ -235,3 +238,36 @@ def get_convos(capture):
     return conversations
 
 #--------------------IP GEOLOCATION MAPPING---------------------
+access_token = os.getenv('IP_ACCESS_TKN')
+
+handler = ipinfo.getHandler(access_token)
+
+def get_coordinates(capture):
+    '''
+    This is a docstring for get_coordinates.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    A dictionary with keys as IP ADDRESSES and values as COORDINATES.
+    '''
+
+    ip_coords = {}
+
+    for pkt in capture:
+        if IP in pkt or IPv6 in pkt:
+            ip_addr = pkt[IP].src if IP in pkt else pkt[IPv6].src
+            
+            details = handler.getDetails(ip_addr)
+            # Convert Details object to dict 
+            details = vars(details)['details']
+
+            # Add IP only if it exists publicly
+            if 'bogon' not in details:
+                # Get only addresses that exist in database
+                if details['latitude'] != None:
+                    location = details['loc']
+                    ip_coords = {ip_addr: location}
+
+    return ip_coords

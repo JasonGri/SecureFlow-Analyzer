@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 
 import concurrent.futures
+import json
 
 from .forms import PcapFileForm
 from .logic import *
@@ -25,6 +26,7 @@ def index(req):
             protocols = get_protocols(capture)
             convos = get_convos(capture)
             top_talkers = get_top_talkers(capture)
+            ip_coords = get_coordinates(capture)
 
             proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
             band_util_hbar = visualize_top_talkers(top_talkers)
@@ -39,7 +41,8 @@ def index(req):
                     'proto_graph_pie': proto_graph_pie,
                     'band_util_hbar': band_util_hbar,
                     'band_util_tseries': band_util_tseries,
-                    'conversations': convos
+                    'conversations': convos,
+                    'ip_coords': ip_coords
                 },
                 'anomaly':{}
             }

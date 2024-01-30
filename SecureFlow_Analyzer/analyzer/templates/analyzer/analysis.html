@@ -121,6 +121,7 @@
     <h2 class="text-center p-2">IP Geolocation</h2>
   </div>
   <!-- IP Geolocation MAP-->
+  {{ ip_coords|json_script:"coordinates" }}
   <div class="row">
     <div class="container rounded"> <div id="map"></div></div>
   </div>
