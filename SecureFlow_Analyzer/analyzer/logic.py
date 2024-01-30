@@ -278,13 +278,12 @@ def get_coordinates(capture):
             
             details = handler.getDetails(ip_addr)
             # Convert Details object to dict 
-            details = vars(details)['details']
+            details_core = vars(details)['details']
 
             # Add IP only if it exists publicly
             if 'bogon' not in details:
                 # Get only addresses that exist in database
-                if details['latitude'] != None:
-                    location = details['loc']
-                    ip_coords = {ip_addr: location}
-
+                if details_core['latitude'] != None:
+                    location = details_core['loc']
+                    ip_coords[ip_addr] = location
     return ip_coords
