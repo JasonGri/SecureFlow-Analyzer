@@ -26,26 +26,34 @@ def index(req):
             protocols = get_protocols(capture)
             convos = get_convos(capture)
             top_talkers = get_top_talkers(capture)
+            band_traffic = get_traffic(capture)
             ip_coords = get_coordinates(capture)
 
-            proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
-            band_util_hbar = visualize_top_talkers(top_talkers)
-            band_util_tseries = bandwidth_timeseries(capture)
-
-            #TODO: Run anomaly detection and assign results to context
 
             context = {
                 'analysis':{
                     'protocols': protocols,
-                    'proto_graph_bar': proto_graph_bar,
-                    'proto_graph_pie': proto_graph_pie,
-                    'band_util_hbar': band_util_hbar,
-                    'band_util_tseries': band_util_tseries,
                     'conversations': convos,
                     'ip_coords': ip_coords
                 },
                 'anomaly':{}
             }
+
+            # Make sure not to plot an empty dict
+            if len(protocols) != 0:
+                proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
+                context['analysis']['proto_graph_bar'] = proto_graph_bar
+                context['analysis']['proto_graph_pie'] = proto_graph_pie
+
+            if len(top_talkers) != 0:
+                band_util_hbar = visualize_top_talkers(top_talkers)
+                context['analysis']['band_util_hbar'] = band_util_hbar
+
+            if len(band_traffic) != 0:
+                band_util_tseries = visualize_traffic(band_traffic)
+                context['analysis']['band_util_tseries'] = band_util_tseries
+
+            #TODO: Run anomaly detection and assign results to context
 
             #Sets context in session for transfer to other views
             req.session['context'] = context

@@ -112,8 +112,16 @@ def visualize_top_talkers(band_dict):
 
     return fig.to_html()
 
-def bandwidth_timeseries(capture):
-    
+def get_traffic(capture):
+    '''
+    This is a docstring for get_traffic.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    A dictionary with keys as DATETIME objects and values as BYTES.
+    '''
     # Extract bytes per time instance
     traffic = Counter()
     for pkt in capture:
@@ -125,10 +133,11 @@ def bandwidth_timeseries(capture):
 
             traffic.update({datetime.fromtimestamp(timestamp):payload})
     
-    traffic = dict(traffic)
+    return dict(traffic)
 
-    # Plotting the timeseries chart
-    data = pd.DataFrame(list(traffic.items()), columns=['Date', 'Bytes'])
+def visualize_traffic(traffic_dict):
+    
+    data = pd.DataFrame(list(traffic_dict.items()), columns=['Date', 'Bytes'])
     data['Date'] = pd.to_datetime(data['Date'])
 
     fig = px.line(data, x=data['Date'], y=data['Bytes'], markers='o')
