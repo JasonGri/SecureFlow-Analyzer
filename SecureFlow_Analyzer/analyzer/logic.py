@@ -22,7 +22,7 @@ import ipinfo
 def get_capture(file_path):
     return rdpcap(file_path)
 
-#**************************ANOMALIES****************************
+#**************************ANALYSIS****************************
 #--------------------PROTOCOL DISTRIBUTION---------------------
 def get_protocols(capture):
     '''

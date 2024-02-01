@@ -46,7 +46,7 @@
     class="navbar navbar-custom border-bottom border-body"
     data-bs-theme="dark"
   >
-    <div class="container-fluid">
+    <div class="container-fluid justify-content-start">
       <a class="navbar-brand" href="{% url 'index' %}">
         <img
           src="{% static 'svgIcons/shield-check.svg' %}"
@@ -57,6 +57,7 @@
         />
         SecureFlow Analyzer
       </a>
+      <a class="nav-link" href="{% url 'analyzer:results' %}">Results</a>
     </div>
   </nav>
   <body>

@@ -116,4 +116,5 @@ body {
 .card {
   background-color: var(--table_body_bg);
   border-color: var(--body_text);
+  max-height: 250px;
 }

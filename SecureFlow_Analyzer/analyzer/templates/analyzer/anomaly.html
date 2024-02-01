@@ -25,7 +25,7 @@
         >{{service.upper}}</button
       >
       {% endfor %} {% for service, socket_pairs in vuln_services.items %}
-      <div class="card collapse" id="{{service}}">
+      <div class="card collapse overflow-auto" id="{{service}}">
         {% for sockets in socket_pairs %}
         <li class="list-group-item">{{sockets}}</li>
         {% endfor %}
