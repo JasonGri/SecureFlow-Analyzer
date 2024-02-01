@@ -1,2 +1,40 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
-<h1 class="text-center">These are the Anomalies observed:</h1>{% endblock %}
+<h1 class="text-center">These are the Anomalies observed:</h1>
+<div class="container-fluid">
+  <!-- 1st Headings Row -->
+  <div class="row">
+    <div class="col-6">
+      <h2 class="text-center p-2">Insecure Services</h2>
+    </div>
+    <div class="col-6">
+      <h2 class="text-center p-2">Malicious IPs</h2>
+    </div>
+  </div>
+  <!-- Vulnerable Services -->
+  <div class="row">
+    <div class="col-6">
+      {% for service, socket_pairs in vuln_services.items %}
+
+      <button
+        class="btn service-btn my-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#{{service}}"
+        aria-expanded="false"
+        aria-controls="{{service}}"
+        >{{service.upper}}</button
+      >
+      {% endfor %} {% for service, socket_pairs in vuln_services.items %}
+      <div class="card collapse" id="{{service}}">
+        {% for sockets in socket_pairs %}
+        <li class="list-group-item">{{sockets}}</li>
+        {% endfor %}
+        <a href="#">More Details</a>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+  <hr class="my-5" />
+</div>
+{% endblock %}

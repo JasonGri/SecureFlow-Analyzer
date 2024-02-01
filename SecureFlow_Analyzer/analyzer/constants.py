@@ -42,3 +42,48 @@ PAPER_BG_COLOR = '#aab8ff'
 PLOT_BG_COLOR = '#cad7ff'
 
 CHART_FONT_COLOR = '#1d2454'
+
+
+VULN_PORT_NUMS = {
+    20: 'ftp-data',
+    21: 'ftp',
+    22: 'ssh',
+    23: 'telnet',
+    992: 'telnets',
+    107: 'rtelnet',
+    69: 'tftp',
+    3389: 'ms-wbt-server',
+    5900: 'vnc',
+    5901: 'vnc-1',
+    5902: 'vnc-2',
+    512: 'exec',
+    513: 'login',
+    514: 'cmd',
+    873: 'rsync',
+    53: 'domain',
+    111: 'sunrpc',
+    2049: 'nfsd',
+    135: 'epmap',
+    137: 'netbios-ns',
+    138: 'netbios-dgm',
+    139: 'netbios-ssn',
+    445: 'microsoft-ds',
+    161: 'snmp',
+    389: 'ldap',
+    25: 'smtp',
+    109: 'pop2',
+    110: 'pop3',
+    143: 'imap',
+    80: 'http',
+    8000: 'http',
+    8080: 'http',
+    8888: 'http',
+    1433: 'ms-sql-s',
+    1521: 'oracle-db',
+    3306: 'mysql-db',
+    5000: 'UPnP',
+    5432: 'postgreSQL-db',
+    6379: 'redis-db',
+    27017: 'mongodb',
+    27018: 'mongodb'
+}

@@ -54,7 +54,8 @@ def index(req):
                 context['analysis']['band_util_tseries'] = band_util_tseries
 
             #TODO: Run anomaly detection and assign results to context
-
+            vuln_services = get_vuln_services(capture)
+            context['anomaly']['vuln_services'] = vuln_services
             #Sets context in session for transfer to other views
             req.session['context'] = context
 

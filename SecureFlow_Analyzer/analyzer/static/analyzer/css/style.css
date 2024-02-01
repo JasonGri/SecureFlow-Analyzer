@@ -25,6 +25,9 @@
   --pag_text: #1d2454;
   --pag_pn_bg: #4252a3;
   --pag_pn_text: #ffffff;
+  /* buttons */
+  --btn: #4252a3;
+  --btn_act: #aab8ff;
 }
 
 body {
@@ -97,4 +100,20 @@ body {
 #map {
   height: 750px;
   border-radius: 10px;
+}
+
+/* Vulnerable Services */
+.service-btn {
+  background-color: var(--btn);
+  color: #ffffff;
+}
+
+.service-btn.active {
+  background-color: var(--btn_act);
+  color: var(--body_text);
+}
+
+.card {
+  background-color: var(--table_body_bg);
+  border-color: var(--body_text);
 }

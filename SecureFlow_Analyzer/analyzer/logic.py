@@ -22,6 +22,7 @@ import ipinfo
 def get_capture(file_path):
     return rdpcap(file_path)
 
+#**************************ANOMALIES****************************
 #--------------------PROTOCOL DISTRIBUTION---------------------
 def get_protocols(capture):
     '''
@@ -286,3 +287,46 @@ def get_coordinates(capture):
                     location = details_core['loc']
                     ip_coords[ip_addr] = location
     return ip_coords
+
+#**************************ANOMALIES*********************************
+#---------------------Insecure/ Vulnerable Services------------------
+# Initialize services dict
+services_dict = {service:[] for service in VULN_PORT_NUMS.values()}
+
+def get_vuln_services(capture):
+    '''
+    This is a docstring for get_vuln_services.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    A dictionary with keys as SERVICE NAMES and values as LISTS OF SOCKET PAIRS.
+    '''
+    for pkt in capture:
+        if IP in pkt or IPv6 in pkt:
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+
+            if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+                # dst port to get the host initiating the communication with a vuln service/ protocol
+                dst_port = ip_layer.dport 
+
+                # Check if port in vulnerable ones
+                if dst_port in VULN_PORT_NUMS.keys():
+                    service = VULN_PORT_NUMS[dst_port]
+
+                    # Gather info
+                    src_ip = ip_layer.src
+                    dst_ip = ip_layer.dst
+                    src_port = ip_layer.sport
+                    socket_pair = f"{src_ip}:{src_port} > {dst_ip}:{dst_port}"
+
+                    # Add only unique socket pairs
+                    if socket_pair not in services_dict[service]:
+                        services_dict[service].append(socket_pair)
+
+
+    # Remove services not utilized
+    filtered_serv_dict = {serv: sum_lst for serv, sum_lst in services_dict.items() if sum_lst}
+
+    return filtered_serv_dict
