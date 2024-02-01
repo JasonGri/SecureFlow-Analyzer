@@ -71,6 +71,7 @@ const convTable = new DataTable("#conversations-table", {
 // Chart surrounding space
 //TODO: Make it round
 
+//FIXME: Make map an analysis specific script
 // IP GEOLOACTION MAPPING
 var map = L.map("map").setView([51.505, -0.09], 13);
 

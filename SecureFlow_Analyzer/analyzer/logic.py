@@ -188,63 +188,62 @@ def get_convos(capture):
         if IP in pkt or IPv6 in pkt:
             ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
 
-            # Gather values
-            src_ip = ip_layer.src
-            dst_ip = ip_layer.dst
-            timestamp = float(pkt.time)
-
-            if ip_layer.version == 4:
-                protocol = proto_nums[int(ip_layer.proto)]
-                payload_bytes = ip_layer.len 
-            elif ip_layer.version == 6:
-                protocol = proto_nums[int(ip_layer.nh)]
-                payload_bytes = ip_layer.plen
-
             if pkt.haslayer(UDP) or pkt.haslayer(TCP):
+                # Gather values
+                src_ip = ip_layer.src
+                dst_ip = ip_layer.dst
                 src_port = pkt.sport
                 dst_port = pkt.dport
+                timestamp = float(pkt.time)
 
-            # Direction doesn't matter 
-            # socket_pair = tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"]))
+                if ip_layer.version == 4:
+                    protocol = proto_nums[int(ip_layer.proto)]
+                    payload_bytes = ip_layer.len 
+                elif ip_layer.version == 6:
+                    protocol = proto_nums[int(ip_layer.nh)]
+                    payload_bytes = ip_layer.plen
 
-            # Direction matters    
-            socket_pair = (f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}")
-            
-            # Add 1st conversation
-            if len(conversations) == 0:
-                conversations[0] = {
-                        'pair': socket_pair,
-                        'src_ip': src_ip,
-                        'dst_ip': dst_ip,
-                        'src_port': src_port,
-                        'dst_port': dst_port, 
-                        'packets': 1,
-                        'bytes': payload_bytes,
-                        'proto': protocol,
-                        'start_time': timestamp,
-                        'end_time': timestamp
-                    }
-            else:    
-                # Update or initialize attributes
-                for k, convo in conversations.items():
-                    if convo['pair'] == socket_pair:
-                        convo['packets'] += 1
-                        convo['bytes'] += payload_bytes
-                        convo['end_time'] = timestamp
-                        break
-                else:
-                    conversations[max(conversations.keys())+1] = {
-                        'pair': socket_pair,
-                        'src_ip': src_ip,
-                        'dst_ip': dst_ip,
-                        'src_port': src_port,
-                        'dst_port': dst_port, 
-                        'packets': 1,
-                        'bytes': payload_bytes,
-                        'proto': protocol,
-                        'start_time': timestamp,
-                        'end_time': timestamp
-                    }
+                # Direction doesn't matter 
+                # socket_pair = tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"]))
+
+                # Direction matters    
+                socket_pair = (f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}")
+                
+                # Add 1st conversation
+                if len(conversations) == 0:
+                    conversations[0] = {
+                            'pair': socket_pair,
+                            'src_ip': src_ip,
+                            'dst_ip': dst_ip,
+                            'src_port': src_port,
+                            'dst_port': dst_port, 
+                            'packets': 1,
+                            'bytes': payload_bytes,
+                            'proto': protocol,
+                            'start_time': timestamp,
+                            'end_time': timestamp
+                        }
+                else:    
+                    # Update or initialize attributes
+                    for k, convo in conversations.items():
+                        if convo['pair'] == socket_pair:
+                            convo['packets'] += 1
+                            convo['bytes'] += payload_bytes
+                            convo['end_time'] = timestamp
+                            break
+                    else:
+                        conversations[max(conversations.keys())+1] = {
+                            'pair': socket_pair,
+                            'src_ip': src_ip,
+                            'dst_ip': dst_ip,
+                            'src_port': src_port,
+                            'dst_port': dst_port, 
+                            'packets': 1,
+                            'bytes': payload_bytes,
+                            'proto': protocol,
+                            'start_time': timestamp,
+                            'end_time': timestamp
+                        }
 
     for k, convo in conversations.items():
         # Convert duration to milliseconds    
@@ -281,7 +280,7 @@ def get_coordinates(capture):
             details_core = vars(details)['details']
 
             # Add IP only if it exists publicly
-            if 'bogon' not in details:
+            if 'bogon' not in details_core:
                 # Get only addresses that exist in database
                 if details_core['latitude'] != None:
                     location = details_core['loc']
