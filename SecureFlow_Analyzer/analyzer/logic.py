@@ -8,6 +8,7 @@ from .constants import *
 from scapy.all import *
 from scapy.layers.inet import *
 from scapy.layers.inet6 import *
+from scapy.layers.dns import *
 
 from collections import Counter
 
@@ -18,6 +19,7 @@ import plotly.express as px
 from datetime import datetime
 import os
 import ipinfo
+import requests
 
 def get_capture(file_path):
     return rdpcap(file_path)
@@ -304,10 +306,9 @@ def get_vuln_services(capture):
     A dictionary with keys as SERVICE NAMES and values as LISTS OF SOCKET PAIRS.
     '''
     for pkt in capture:
-        if IP in pkt or IPv6 in pkt:
-            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
-
             if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+                ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+
                 # dst port to get the host initiating the communication with a vuln service/ protocol
                 dst_port = ip_layer.dport 
 
@@ -330,3 +331,51 @@ def get_vuln_services(capture):
     filtered_serv_dict = {serv: sum_lst for serv, sum_lst in services_dict.items() if sum_lst}
 
     return filtered_serv_dict
+
+#---------------------Malicious Domains------------------
+# Fetch data each time before analysis (UP-TO-DATE)
+def fetch_data(url):
+
+    response = requests.get(url)
+    data = response.text
+
+    return data
+
+def is_dom_suspicious(capture, data):
+    '''
+    This is a docstring for is_dom_suspicious.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+    - data: A string of multiple known malicious domains. 
+
+    Returns:
+    A list comprised of dictionaries with src_ip, dst_ip, domain_name, and datetime of the incident.
+    '''
+    sus_entries = []
+    domain_lines = data.strip().split('\n')
+    dom_lst = [line.split(' ')[-1] for line in domain_lines]
+
+    for pkt in capture:
+        # Check to see if it is a QUERY
+        if pkt.haslayer(DNSQR):
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+            # Extract domain name
+            # Decode and remove trailing dot of FQDN
+            try:
+                domain = pkt[DNSQR].qname.decode('utf-8')[:-1]
+            except UnicodeDecodeError:
+                domain = pkt[DNSQR].qname.decode('latin-1')[:-1]
+
+            # Check if domain is malicious
+            for mal_dom in dom_lst:
+                if domain == mal_dom:
+                    timestamp = float(ip_layer.time)
+                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    entry = {"src_ip": ip_layer.src, "dst_ip": ip_layer.dst, "domain_name": domain, "date_time": date_time}
+
+                    if entry not in sus_entries:
+                        sus_entries.append(entry)
+
+    return sus_entries

@@ -56,6 +56,11 @@ def index(req):
             #TODO: Run anomaly detection and assign results to context
             vuln_services = get_vuln_services(capture)
             context['anomaly']['vuln_services'] = vuln_services
+
+            mal_doms = fetch_data(MALICIOUS_DOMAINS_URL)
+            sus_dom_entries = is_dom_suspicious(capture, mal_doms)
+            context['anomaly']['sus_dom_entries'] = sus_dom_entries
+            
             #Sets context in session for transfer to other views
             req.session['context'] = context
 

@@ -87,3 +87,9 @@ VULN_PORT_NUMS = {
     27017: 'mongodb',
     27018: 'mongodb'
 }
+
+MALICIOUS_DOMAINS_URL = 'https://hole.cert.pl/domains/domains_hosts.txt'
+
+MALICIOUS_IP = ['https://www.spamhaus.org/drop/drop.txt', 'https://www.spamhaus.org/drop/edrop.txt']
+
+MALICIOUS_IPV6 = 'https://www.spamhaus.org/drop/dropv6.txt'

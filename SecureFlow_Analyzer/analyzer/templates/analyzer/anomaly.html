@@ -7,12 +7,12 @@
       <h2 class="text-center p-2">Insecure Services</h2>
     </div>
     <div class="col-6">
-      <h2 class="text-center p-2">Malicious IPs</h2>
+      <h2 class="text-center p-2">Malicious Domains</h2>
     </div>
   </div>
-  <!-- Vulnerable Services -->
   <div class="row">
-    <div class="col-6">
+    <!-- Vulnerable Services -->
+    <div class="col-6 text-center">
       {% for service, socket_pairs in vuln_services.items %}
 
       <button
@@ -25,7 +25,7 @@
         >{{service.upper}}</button
       >
       {% endfor %} {% for service, socket_pairs in vuln_services.items %}
-      <div class="card collapse overflow-auto" id="{{service}}">
+      <div class="card collapse overflow-auto text-start" id="{{service}}">
         {% for sockets in socket_pairs %}
         <li class="list-group-item">{{sockets}}</li>
         {% endfor %}
@@ -33,6 +33,18 @@
       </div>
 
       {% endfor %}
+    </div>
+    <!-- Malicious Domains -->
+    <div class="col-6">
+      <div class="card overflow-auto">
+        {% for entry in sus_dom_entries %}
+        <li class="list-group-item m-3"
+          >Src. IP: <u>{{entry.src_ip}}</u> --&gt; Dst. IP:
+          <u>{{entry.dst_ip}}</u>, Malicious Domain:
+          <strong style="color: #ff1144">{{entry.domain_name}}</strong></li
+        >
+        {% endfor %}
+      </div>
     </div>
   </div>
   <hr class="my-5" />
