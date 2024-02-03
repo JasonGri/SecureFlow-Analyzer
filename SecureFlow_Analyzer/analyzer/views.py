@@ -60,6 +60,10 @@ def index(req):
             mal_doms = fetch_data(MALICIOUS_DOMAINS_URL)
             sus_dom_entries = is_dom_suspicious(capture, mal_doms)
             context['anomaly']['sus_dom_entries'] = sus_dom_entries
+
+            mal_ips = fetch_data(MALICIOUS_IP_URL)
+            sus_ip_entries = is_ip_suspicious(capture, mal_ips)
+            context['anomaly']['sus_ip_entries'] = sus_ip_entries
             
             #Sets context in session for transfer to other views
             req.session['context'] = context

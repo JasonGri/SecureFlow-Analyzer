@@ -37,6 +37,10 @@ body {
   margin-bottom: 75px;
 }
 
+hr {
+  border-color: var(--body_text);
+}
+
 /* Navigation Bar Related */
 .navbar-custom {
   background-color: var(--nav_bg);
@@ -61,10 +65,6 @@ body {
 }
 
 /* Conversations Table */
-/* .table-container {
-  max-height: 500px;
-  overflow-y: auto;
-} */
 
 #conversations-table thead th {
   background-color: var(--table_head_bg);
@@ -119,4 +119,8 @@ body {
   max-height: 250px;
 }
 
+.vertical-separation {
+  border-right: 1px solid rgba(29, 36, 84, 0.5);
+  padding-right: 15px;
+}
 /* Malicious Domains */

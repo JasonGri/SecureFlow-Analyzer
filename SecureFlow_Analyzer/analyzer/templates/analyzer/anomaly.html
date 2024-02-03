@@ -3,17 +3,22 @@
 <div class="container-fluid">
   <!-- 1st Headings Row -->
   <div class="row">
-    <div class="col-6">
+    <div class="col-4">
       <h2 class="text-center p-2">Insecure Services</h2>
     </div>
-    <div class="col-6">
+    <div class="col-4">
       <h2 class="text-center p-2">Malicious Domains</h2>
+    </div>
+    <div class="col-4">
+      <h2 class="text-center p-2">Malicious IPs</h2>
     </div>
   </div>
   <div class="row">
     <!-- Vulnerable Services -->
-    <div class="col-6 text-center">
-      {% for service, socket_pairs in vuln_services.items %}
+    <div class="col-4 text-center vertical-separation">
+      {% if not vuln_services %}
+      <p>No vulnerable services detected.</p>
+      {% else %} {% for service, socket_pairs in vuln_services.items %}
 
       <button
         class="btn service-btn my-1"
@@ -31,11 +36,13 @@
         {% endfor %}
         <a href="#">More Details</a>
       </div>
-
-      {% endfor %}
+      {% endfor %} {% endif %}
     </div>
     <!-- Malicious Domains -->
-    <div class="col-6">
+    <div class="col-4 vertical-separation">
+      {% if not sus_dom_entries %}
+      <p>No malicious domains detected.</p>
+      {% else %}
       <div class="card overflow-auto">
         {% for entry in sus_dom_entries %}
         <li class="list-group-item m-3"
@@ -45,6 +52,24 @@
         >
         {% endfor %}
       </div>
+      {% endif %}
+    </div>
+    <!-- Malicious IPs -->
+    <div class="col-4">
+      {% if not sus_ip_entries %}
+      <p>No Malcious IP addresses detected.</p>
+      {% else %}
+      <div class="card overflow-auto">
+        {% for entry in sus_ip_entries %}
+        <li class="list-group-item m-3"
+          >Src. IP: <u>{{entry.src_ip}}</u
+          ><strong>{{entry.src_port}}</strong> --&gt; Dst. IP:
+          <u>{{entry.dst_ip}}</u><strong>{{entry.dst_port}}</strong>, Malicious
+          Domain: <strong style="color: #ff1144">{{entry.mal_ip}}</strong></li
+        >
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
   <hr class="my-5" />
