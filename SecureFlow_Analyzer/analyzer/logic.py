@@ -3,6 +3,7 @@ Here is where the logic will be placed, in more detail the functions analyzing t
 '''
 from django.conf import settings
 from .constants import *
+from .utils import *
 
 # Scapy
 from scapy.all import *
@@ -21,11 +22,13 @@ import os
 import ipinfo
 import requests
 
+@timeit
 def get_capture(file_path):
     return rdpcap(file_path)
 
 #**************************ANALYSIS****************************
 #--------------------PROTOCOL DISTRIBUTION---------------------
+@timeit
 def get_protocols(capture):
     '''
     This is a docstring for get_protocols.
@@ -55,6 +58,7 @@ def get_protocols(capture):
     proto_counter.update(proto_list)
     return dict(proto_counter)
 
+@timeit
 def visualize_protocols(proto_dict):
 
     data = pd.DataFrame(list(proto_dict.items()), columns=['Protocols', 'Occurrences'])
@@ -72,6 +76,7 @@ def visualize_protocols(proto_dict):
     return fig1.to_html(), fig2.to_html()
 
 #--------------------BANDWIDTH UTILIZATION---------------------
+@timeit
 def get_top_talkers(capture):
     '''
     This is a docstring for get_top_talkers.
@@ -107,10 +112,10 @@ def get_top_talkers(capture):
     
     return top_ten
 
+@timeit
 def visualize_top_talkers(band_dict):
 
     data = pd.DataFrame(list(band_dict.items()), columns=['IP', 'Bytes'])
-    print(data)
 
     # Plot Horizontal Bar Chart
     fig = px.bar(data, x=data['Bytes'], y=data['IP'], orientation='h', color='IP') 
@@ -119,6 +124,7 @@ def visualize_top_talkers(band_dict):
 
     return fig.to_html()
 
+@timeit
 def get_traffic(capture):
     '''
     This is a docstring for get_traffic.
@@ -145,6 +151,7 @@ def get_traffic(capture):
     
     return dict(traffic)
 
+@timeit
 def visualize_traffic(traffic_dict):
     
     data = pd.DataFrame(list(traffic_dict.items()), columns=['Date', 'Bytes'])
@@ -157,6 +164,7 @@ def visualize_traffic(traffic_dict):
     return fig.to_html()
 
 #--------------------CONVERSATIONS---------------------
+@timeit
 def get_convos(capture):
     '''
     This is a docstring for get_convos.
@@ -261,6 +269,7 @@ access_token = os.getenv('IP_ACCESS_TKN')
 
 handler = ipinfo.getHandler(access_token)
 
+@timeit
 def get_coordinates(capture):
     '''
     This is a docstring for get_coordinates.
@@ -295,6 +304,7 @@ def get_coordinates(capture):
 # Initialize services dict
 services_dict = {service:[] for service in VULN_PORT_NUMS.values()}
 
+@timeit
 def get_vuln_services(capture):
     '''
     This is a docstring for get_vuln_services.
@@ -334,6 +344,7 @@ def get_vuln_services(capture):
 
 #---------------------Malicious Domains------------------
 # Fetch data each time before analysis (UP-TO-DATE)
+@timeit
 def fetch_data(url):
 
     response = requests.get(url)
@@ -341,6 +352,7 @@ def fetch_data(url):
 
     return data
 
+@timeit
 def is_dom_suspicious(capture, data):
     '''
     This is a docstring for is_dom_suspicious.
@@ -353,6 +365,7 @@ def is_dom_suspicious(capture, data):
     A list comprised of dictionaries with src_ip, dst_ip, domain_name, and datetime of the incident.
     '''
     sus_entries = []
+    # Parse only domain names to a list
     domain_lines = data.strip().split('\n')
     dom_lst = [line.split(' ')[-1] for line in domain_lines]
 
@@ -377,5 +390,44 @@ def is_dom_suspicious(capture, data):
 
                     if entry not in sus_entries:
                         sus_entries.append(entry)
+
+    return sus_entries
+
+#---------------------Malicious IPs------------------
+@timeit
+def is_ip_suspicious(capture, data):
+    sus_entries = []
+    # Parse data into set for faster iteration
+    parsed_data = set(data.splitlines())
+
+    for pkt in capture:
+        if pkt.haslayer(IP) or pkt.haslayer(IPv6):
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+            src_ip = ip_layer.src
+            dst_ip = ip_layer.dst
+
+
+            if src_ip in parsed_data or dst_ip in parsed_data:
+
+                mal_ip = src_ip if src_ip in parsed_data else dst_ip
+                
+                # Get port numbers
+                if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+                    # Resolve service names if they exist
+                    try:
+                        src_port = socket.getservbyport(pkt.sport)
+                    except:
+                        src_port = pkt.sport
+
+                    try:
+                        dst_port = socket.getservbyport(pkt.dport)
+                    except:
+                        dst_port = pkt.dport
+                
+                entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip, 'src_port': src_port, 'dst_port': dst_port}
+
+                if entry not in sus_entries:
+                    sus_entries.append(entry)
+
 
     return sus_entries
