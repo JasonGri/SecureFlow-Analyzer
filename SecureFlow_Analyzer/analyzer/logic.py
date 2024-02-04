@@ -366,6 +366,7 @@ def is_dom_suspicious(capture, data):
     '''
     sus_entries = []
     # Parse only domain names to a list
+    # Parse only domain names to a list
     domain_lines = data.strip().split('\n')
     dom_lst = [line.split(' ')[-1] for line in domain_lines]
 
