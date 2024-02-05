@@ -366,7 +366,6 @@ def is_dom_suspicious(capture, data):
     '''
     sus_entries = []
     # Parse only domain names to a list
-    # Parse only domain names to a list
     domain_lines = data.strip().split('\n')
     dom_lst = [line.split(' ')[-1] for line in domain_lines]
 
@@ -412,20 +411,15 @@ def is_ip_suspicious(capture, data):
 
                 mal_ip = src_ip if src_ip in parsed_data else dst_ip
                 
+                entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip} # Creates an entry for cases like ICMP where port num concept doesnt exist
+
                 # Get port numbers
                 if pkt.haslayer(TCP) or pkt.haslayer(UDP):
                     # Resolve service names if they exist
-                    try:
-                        src_port = socket.getservbyport(pkt.sport)
-                    except:
-                        src_port = pkt.sport
+                    src_port = resolve_service(pkt.sport)
+                    dst_port = resolve_service(pkt.dport)
 
-                    try:
-                        dst_port = socket.getservbyport(pkt.dport)
-                    except:
-                        dst_port = pkt.dport
-                
-                entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip, 'src_port': src_port, 'dst_port': dst_port}
+                    entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip, 'src_port': src_port, 'dst_port': dst_port}
 
                 if entry not in sus_entries:
                     sus_entries.append(entry)

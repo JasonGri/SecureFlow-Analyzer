@@ -1,4 +1,4 @@
-import time
+import time, socket
 
 # Decorator to measure execution time
 def timeit(f):
@@ -16,3 +16,12 @@ def timeit(f):
         return result
     
     return timed
+
+
+# Resolve service names if they exist
+def resolve_service(port):
+    try:
+        service_name = socket.getservbyport(port)
+        return service_name
+    except:
+        return port
