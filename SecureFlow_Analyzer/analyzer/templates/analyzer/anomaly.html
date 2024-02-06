@@ -18,7 +18,7 @@
     <div class="col-4 text-center vertical-separation">
       {% if not vuln_services %}
       <p>No vulnerable services detected.</p>
-      {% else %} {% for service, socket_pairs in vuln_services.items %}
+      {% else %} {% for service, entry_lst in vuln_services.items %}
 
       <button
         class="btn service-btn my-1"
@@ -29,12 +29,14 @@
         aria-controls="{{service}}"
         >{{service.upper}}</button
       >
-      {% endfor %} {% for service, socket_pairs in vuln_services.items %}
+      {% endfor %} {% for service, entry_lst in vuln_services.items %}
       <div class="card collapse overflow-auto text-start" id="{{service}}">
-        {% for sockets in socket_pairs %}
-        <li class="list-group-item">{{sockets}}</li>
+        {% for entry in entry_lst %}
+        <li class="list-group-item">Src. IP: <u>{{entry.src_ip}}</u>:<strong>{{entry.src_port}}</strong> --&gt; Dst. IP:
+          <u>{{entry.dst_ip}}</u>:<strong>{{entry.dst_port}}</strong></li
+        > {{entry.date_time}}</li>
         {% endfor %}
-        <a href="#">More Details</a>
+        <a href="https://www.speedguide.net/port.php?port={{entry_lst.0.dst_port}}">More Details</a>
       </div>
       {% endfor %} {% endif %}
     </div>

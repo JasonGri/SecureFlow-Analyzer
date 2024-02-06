@@ -299,11 +299,8 @@ def get_coordinates(capture):
                     ip_coords[ip_addr] = location
     return ip_coords
 
-#**************************ANOMALIES*********************************
-#---------------------Insecure/ Vulnerable Services------------------
-# Initialize services dict
-services_dict = {service:[] for service in VULN_PORT_NUMS.values()}
-
+#**********************ANOMALIES*************************
+#----------------------Insecure/ Vulnerable Services---------
 @timeit
 def get_vuln_services(capture):
     '''
@@ -313,33 +310,37 @@ def get_vuln_services(capture):
     - capture: The Scapy's PacketList obj from the uploaded PCAP file.
 
     Returns:
-    A dictionary with keys as SERVICE NAMES and values as LISTS OF SOCKET PAIRS.
+    A dictionary with keys as SERVICE NAMES and values as LISTS OF ENTRY.
     '''
+    # Initialize services dict
+    services_dict = {service: [] for service in VULN_PORT_NUMS.values()}
+
     for pkt in capture:
-            if pkt.haslayer(TCP) or pkt.haslayer(UDP):
-                ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+        if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+            # dst port to get the host initiating the communication with a vuln service/ protocol
+            dst_port = pkt.dport
 
-                # dst port to get the host initiating the communication with a vuln service/ protocol
-                dst_port = ip_layer.dport 
+            # Check if port in vulnerable ones
+            if dst_port in VULN_PORT_NUMS.keys():
+                service = VULN_PORT_NUMS[dst_port]
 
-                # Check if port in vulnerable ones
-                if dst_port in VULN_PORT_NUMS.keys():
-                    service = VULN_PORT_NUMS[dst_port]
+                # Gather info
+                src_ip = ip_layer.src
+                dst_ip = ip_layer.dst
+                src_port = pkt.sport
+                timestamp = float(ip_layer.time)
+                date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
-                    # Gather info
-                    src_ip = ip_layer.src
-                    dst_ip = ip_layer.dst
-                    src_port = ip_layer.sport
-                    socket_pair = f"{src_ip}:{src_port} > {dst_ip}:{dst_port}"
+                entry = {"src_ip": src_ip, "dst_ip": dst_ip, "src_port": src_port, "dst_port": dst_port, "date_time": date_time, }
 
-                    # Add only unique socket pairs
-                    if socket_pair not in services_dict[service]:
-                        services_dict[service].append(socket_pair)
-
-
+                # Add only unique socket pairs
+                if entry not in services_dict[service]:
+                    services_dict[service].append(entry)
+    
     # Remove services not utilized
     filtered_serv_dict = {serv: sum_lst for serv, sum_lst in services_dict.items() if sum_lst}
-
+    
     return filtered_serv_dict
 
 #---------------------Malicious Domains------------------
