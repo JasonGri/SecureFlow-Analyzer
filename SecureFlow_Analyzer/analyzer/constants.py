@@ -92,6 +92,4 @@ MALICIOUS_DOMAINS_URL = 'https://hole.cert.pl/domains/domains_hosts.txt'
 
 MALICIOUS_IP_URL = 'https://raw.githubusercontent.com/stamparm/ipsum/master/levels/1.txt'
 
-['https://www.spamhaus.org/drop/drop.txt', 'https://www.spamhaus.org/drop/edrop.txt']
-
-MALICIOUS_IPV6 = 'https://www.spamhaus.org/drop/dropv6.txt'
+MALICIOUS_IPV6_URL = 'https://www.spamhaus.org/drop/dropv6.txt'

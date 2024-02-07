@@ -61,8 +61,9 @@ def index(req):
             sus_dom_entries = is_dom_suspicious(capture, mal_doms)
             context['anomaly']['sus_dom_entries'] = sus_dom_entries
 
-            mal_ips = fetch_data(MALICIOUS_IP_URL)
-            sus_ip_entries = is_ip_suspicious(capture, mal_ips)
+            mal_ipv4 = fetch_data(MALICIOUS_IP_URL)
+            mal_ipv6 = fetch_data(MALICIOUS_IPV6_URL)
+            sus_ip_entries = is_ip_suspicious(capture, mal_ipv4, mal_ipv6)
             context['anomaly']['sus_ip_entries'] = sus_ip_entries
             
             #Sets context in session for transfer to other views

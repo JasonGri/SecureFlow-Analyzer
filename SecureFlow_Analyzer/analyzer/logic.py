@@ -21,6 +21,8 @@ from datetime import datetime
 import os
 import ipinfo
 import requests
+from ipaddress import IPv6Address, IPv6Network 
+from itertools import islice
 
 @timeit
 def get_capture(file_path):
@@ -396,34 +398,57 @@ def is_dom_suspicious(capture, data):
 
 #---------------------Malicious IPs------------------
 @timeit
-def is_ip_suspicious(capture, data):
+def is_ip_suspicious(capture, data4, data6):
     sus_entries = []
     # Parse data into set for faster iteration
-    parsed_data = set(data.splitlines())
+    mal_ipv4 = set(data4.splitlines()) # IPv4 addresses
+    mal_ipv6 = set([line.split(';')[0].strip() for line in data6.splitlines()]) # IPv6 address prefixes
+    mal_ipv6.remove('')
+    mal_ipv6_nets = [IPv6Network(ipv6_prefix) for ipv6_prefix in mal_ipv6] # IPv6 Networks
 
     for pkt in capture:
-        if pkt.haslayer(IP) or pkt.haslayer(IPv6):
-            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+        # Handles IPv4 addresses
+        if pkt.haslayer(IP):
+            ip_layer = pkt[IP]
             src_ip = ip_layer.src
             dst_ip = ip_layer.dst
 
+            if src_ip in mal_ipv4 or dst_ip in mal_ipv4:
 
-            if src_ip in parsed_data or dst_ip in parsed_data:
-
-                mal_ip = src_ip if src_ip in parsed_data else dst_ip
-                
-                entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip} # Creates an entry for cases like ICMP where port num concept doesnt exist
-
-                # Get port numbers
+                mal_ip = src_ip if src_ip in mal_ipv4 else dst_ip
+                entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip} # Handles cases like ICMP where no port number concept exists
+                    # Get port numbers
                 if pkt.haslayer(TCP) or pkt.haslayer(UDP):
                     # Resolve service names if they exist
                     src_port = resolve_service(pkt.sport)
                     dst_port = resolve_service(pkt.dport)
-
+                
                     entry = {"mal_ip": mal_ip, "src_ip": src_ip, "dst_ip": dst_ip, 'src_port': src_port, 'dst_port': dst_port}
 
                 if entry not in sus_entries:
                     sus_entries.append(entry)
 
+        # Handles IPv6 Addresses
+        elif pkt.haslayer(IPv6):
+            ip_layer = pkt[IPv6]
+            src_ip = IPv6Address(ip_layer.src)
+            dst_ip = IPv6Address(ip_layer.dst)
+
+            for net in mal_ipv6_nets:
+                if src_ip in net or dst_ip in net:
+
+                    mal_ip = src_ip if src_ip in net else dst_ip
+                    entry = {"mal_ip": str(mal_ip), "src_ip": str(src_ip), "dst_ip": str(dst_ip)} # Handles cases like ICMP where no port number concept exists
+                
+                    # Get port numbers
+                    if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+                        # Resolve service names if they exist
+                        src_port = resolve_service(pkt.sport)
+                        dst_port = resolve_service(pkt.dport)
+                    
+                        entry = {"mal_ip": str(mal_ip), "src_ip": str(src_ip), "dst_ip": str(dst_ip), 'src_port': src_port, 'dst_port': dst_port}
+
+                    if entry not in sus_entries:
+                        sus_entries.append(entry)
 
     return sus_entries
