@@ -75,5 +75,23 @@
     </div>
   </div>
   <hr class="my-5" />
+  <!-- 2nd Headings Row -->
+  <div class="row">
+    <div class="col-8">
+      <h2 class="text-center p-2">DDoS and DoS Alerts</h2>
+  </div>
+  <div class="row">
+    <div class="col-8">
+      {% if not dos_alerts %}
+      <p>No vulnerable services detected.</p>
+      {% else %} 
+      <ul class="list-group">
+        {% for alert in dos_alerts %}
+        <li class="list-group-item">Type of Attack:<strong> {{alert.type}}</strong><br>Src. IP:<strong>{{alert.src_ip}}</strong><br>Dst. IP:<strong> {{alert.dst_ip}}</strong><br>Time:<strong>{{alert.date_time}}</strong></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

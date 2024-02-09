@@ -452,3 +452,124 @@ def is_ip_suspicious(capture, data4, data6):
                         sus_entries.append(entry)
 
     return sus_entries
+
+#---------------------(D)DoS Attacks-----------------
+# Ping-of-Death
+@timeit
+def get_offsets(capture):
+    '''
+    Parameters:
+        - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    Dictionary with IPv4 identification nums as keys & list of offets as values
+    '''
+    offset_dict = {}
+    for pkt in capture:
+        # Check if packet has ip layer 
+        if IP in pkt:
+            ip_layer = pkt[IP]
+
+            # Check if packet has MF(more fragments flag) && next proto is ICMP
+            if ip_layer.flags == 1 and ip_layer.proto == 1:
+                frag_offset = ip_layer.frag
+
+                if ip_layer.id not in offset_dict:
+                    offset_dict[ip_layer.id] = [frag_offset]
+                else:
+                    offset_dict[ip_layer.id].append(frag_offset)
+
+    for id, offset_lst in offset_dict.items():
+        # Calculate the offset interval to add the final offset that does not contain MF flag
+        offset_interval = {offset_lst[i + 1] - offset_lst[i] for i in range(len(offset_lst) - 1)}.pop()
+        # Add final offset
+        offset_lst.append(offset_lst[-1] + offset_interval)
+    
+    return offset_dict
+
+@timeit
+def get_total_size(capture, offsets):
+    '''
+    Parameters:
+        - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+        - offsets: Dictionary IPv4 IDS and list of offsets
+        
+    Returns:
+    Dictionary with IPv4 identification nums as keys & int of total packet size as value.
+    '''
+    frag_sums = {}
+    for pkt in capture:
+        if IP in pkt:
+            ip_layer = pkt[IP]
+
+            # Iterate through the IPv4 Identification numbers
+            for id, offset_lst in offsets.items():
+                # Match the Identification
+                if ip_layer.id == id:
+                    # Iterate through the offsets for that id
+                    for offset in offset_lst:
+                        # Match the offset
+                        if ip_layer.frag == offset:
+                            # Get payload size
+                            payload_size = len(ip_layer.payload)
+
+                            # Initiate/ Update the byte sums 
+                            if id not in frag_sums:
+                                frag_sums[id] = payload_size
+                            else:
+                                frag_sums[id] += payload_size
+
+    for id, sum in frag_sums.items():
+        # Add IP & Ether headers
+        frag_sums[id] += (20 + 14)
+    
+    return frag_sums
+
+@timeit
+def PoD_detect(capture, size_sums, alerts):
+    '''
+    Parameters:
+        - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+        - size_sums: Dictionary with IPv4 Ids and int of total packet size.
+
+    Updates:
+    List with alert messages including Src, Dst IP addreses and Time of the incident.
+    '''   
+    # Check for oversized un-fragmented ICMP packets
+    for pkt in capture:
+        if pkt.haslayer(ICMP):
+            # Check for Echo Request explicitly
+            if pkt[ICMP].type == 8:
+                pkt_size = len(pkt)
+
+                # Check if it exceeds maximum packet size
+                if pkt_size > 65535:
+                    src_ip = pkt[IP].src
+                    dst_ip = pkt[IP].dst
+                    timestamp = float(ip_layer.time)
+                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                    alert_msg = {'type':"Ping of Death",'src_ip':src_ip,'dst_ip':dst_ip, 'date_time':date_time}
+
+                    alerts.append(alert_msg)
+
+    # Iterate through fragmented packet sums
+    for id, sum in size_sums.items():
+        # Check if it exceeds maximum packet size
+        if sum > 65535:
+            for pkt in capture:
+                # Check for ICMP in packet 
+                if ICMP in pkt:
+                    ip_layer = pkt[IP]
+                    # Check for the Echo Request only(dont add all the IPv4 fragments or the ICMP replies)
+                    if ip_layer.id == id and pkt[ICMP].type == 8:
+
+                        src_ip = ip_layer.src
+                        dst_ip = ip_layer.dst
+                        timestamp = float(ip_layer.time)
+                        date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                        # alert_msg = f"Possible DoS 'Ping of Death' attack detected:\n\tSrc. IP:{src_ip}\n\tDst. IP:{dst_ip}\n\tTime: {timestamp}"
+                        alert_msg = {'type':"Ping of Death",'src_ip':src_ip,'dst_ip':dst_ip, 'date_time':date_time}
+
+                        alerts.append(alert_msg)
+
+# ICMP Flood

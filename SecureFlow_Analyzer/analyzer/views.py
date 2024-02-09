@@ -66,6 +66,12 @@ def index(req):
             sus_ip_entries = is_ip_suspicious(capture, mal_ipv4, mal_ipv6)
             context['anomaly']['sus_ip_entries'] = sus_ip_entries
             
+            dos_alerts = []
+            offset_dict = get_offsets(capture)
+            frag_sums = get_total_size(capture, offset_dict)
+            PoD_detect(capture, frag_sums, dos_alerts)
+            context['anomaly']['dos_alerts'] = dos_alerts
+
             #Sets context in session for transfer to other views
             req.session['context'] = context
 
