@@ -49,7 +49,7 @@
         {% for entry in sus_dom_entries %}
         <li class="list-group-item m-3"
           >Src. IP: <u>{{entry.src_ip}}</u> --&gt; Dst. IP:
-          <u>{{entry.dst_ip}}</u>, Malicious Domain:
+          <u>{{entry.dst_ip}}</u><br>Malicious Domain:
           <strong style="color: #ff1144">{{entry.domain_name}}</strong></li
         >
         {% endfor %}
@@ -66,8 +66,8 @@
         <li class="list-group-item m-3"
           >Src. IP: <u>{{entry.src_ip}}</u
           ><strong>{{entry.src_port}}</strong> --&gt; Dst. IP:
-          <u>{{entry.dst_ip}}</u><strong>{{entry.dst_port}}</strong>, Malicious
-          Domain: <strong style="color: #ff1144">{{entry.mal_ip}}</strong></li
+          <u>{{entry.dst_ip}}</u><strong>{{entry.dst_port}}</strong> <br>Malicious
+          IP: <strong style="color: #ff1144">{{entry.mal_ip}}</strong></li
         >
         {% endfor %}
       </div>

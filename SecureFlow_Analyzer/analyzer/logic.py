@@ -142,7 +142,7 @@ def get_traffic(capture):
     for pkt in capture:
         if IP in pkt or IPv6 in pkt:
             ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
-            timestamp = float(ip_layer.time)
+            timestamp = float(pkt.time)
 
             if ip_layer.version == 4:
                 payload = ip_layer.len  
@@ -331,8 +331,8 @@ def get_vuln_services(capture):
                 src_ip = ip_layer.src
                 dst_ip = ip_layer.dst
                 src_port = pkt.sport
-                timestamp = float(ip_layer.time)
-                date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                timestamp = float(pkt.time)
+                date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
                 entry = {"src_ip": src_ip, "dst_ip": dst_ip, "src_port": src_port, "dst_port": dst_port, "date_time": date_time, }
 
@@ -386,8 +386,8 @@ def is_dom_suspicious(capture, data):
             # Check if domain is malicious
             for mal_dom in dom_lst:
                 if domain == mal_dom:
-                    timestamp = float(ip_layer.time)
-                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                    timestamp = float(pkt.time)
+                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                     
                     entry = {"src_ip": ip_layer.src, "dst_ip": ip_layer.dst, "domain_name": domain, "date_time": date_time}
 
