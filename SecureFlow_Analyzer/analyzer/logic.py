@@ -546,9 +546,9 @@ def PoD_detect(capture, size_sums, alerts):
                 if pkt_size > 65535:
                     src_ip = pkt[IP].src
                     dst_ip = pkt[IP].dst
-                    timestamp = float(ip_layer.time)
-                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-                    alert_msg = {'type':"Ping of Death",'src_ip':src_ip,'dst_ip':dst_ip, 'date_time':date_time}
+                    timestamp = float(pkt.time)
+                    date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                    alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time}
 
                     alerts.append(alert_msg)
 
@@ -565,11 +565,116 @@ def PoD_detect(capture, size_sums, alerts):
 
                         src_ip = ip_layer.src
                         dst_ip = ip_layer.dst
-                        timestamp = float(ip_layer.time)
-                        date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-                        # alert_msg = f"Possible DoS 'Ping of Death' attack detected:\n\tSrc. IP:{src_ip}\n\tDst. IP:{dst_ip}\n\tTime: {timestamp}"
-                        alert_msg = {'type':"Ping of Death",'src_ip':src_ip,'dst_ip':dst_ip, 'date_time':date_time}
+                        timestamp = float(pkt.time)
+                        date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                        alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time}
 
                         alerts.append(alert_msg)
 
 # ICMP Flood
+@timeit                        
+def time_group(capture, time_threshold):
+    '''
+    This is a docstring for time_group.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+    - time_threshold: An integer representing seconds. 
+
+    Returns:
+    A list comprised of PacketList() objects each containing ICMP Echo Requests in time_threshold groups.
+    '''   
+    grouped_packets = []
+
+    # Sort packets based on timestamp
+    sorted_packets = sorted(capture, key=lambda x: x.time)
+
+    current_group = PacketList()
+    current_group_start_time = None
+
+
+    for pkt in sorted_packets:
+        # Check for ICMP packets
+        if ICMP in pkt:
+            icmp_layer = pkt[ICMP]
+            # Filter for Echo Request ICMP packets
+            if icmp_layer.type == 8:
+
+                # 1st Initialization
+                if current_group_start_time == None:    
+                    current_group.append(pkt)
+                    current_group_start_time = pkt.time
+                
+                # Threshold is exceeded
+                elif (pkt.time - current_group_start_time > time_threshold):
+                    grouped_packets.append(current_group) # Group to list of groups
+                    current_group = PacketList()# Create new group
+                    current_group.append(pkt) # Add that pkt to new group
+                    current_group_start_time = pkt.time # Initialize time of new group
+
+                # Threshold not exceeded
+                else:
+                    current_group.append(pkt)
+
+    # Append last group
+    grouped_packets.append(current_group)
+    
+    return grouped_packets
+
+@timeit
+def icmp_flood_detect(time_groups, pkt_threshold):
+    '''
+    This is a docstring for icmp_flood_detect.
+
+    Parameters:
+    - time_groups: List of PacketList() objects.
+    - pkt_threshold: An integer representing number of packets threshold. 
+
+    Returns:
+    A list comprised of dictionaries with src_ip, dst_ip, domain_name, and datetime of the incident.
+    '''
+    potential_floods = {}
+    for group in time_groups:
+        group_num = time_groups.index(group)
+        for pkt in group:
+            ip_layer = pkt[IP]
+            src_ip = ip_layer.src
+            dst_ip = ip_layer.dst
+            timestamp = float(pkt.time)
+            date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+
+            # Set potential flood identifier
+            flood_id = f'{src_ip}{dst_ip}{group_num}' # Takes into account src, dst, and time
+
+            # Add flood entry if it doesnt exist
+            if flood_id not in potential_floods:
+                potential_floods[flood_id] = {'type':'ICMP Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'start_time': date_time, 'count': 1}
+            else:
+                # Increase pkt counter otherwise
+                potential_floods[flood_id]['count'] += 1
+
+    # Gather all keys of the values that do not surpass the threshold   
+    entries_to_remove = []
+    for id, flood in potential_floods.items():
+        if flood['count'] < pkt_threshold:
+            # Remove flood entry withing threshold
+            entries_to_remove.append(id)
+
+    # Remove those entries
+    for id in entries_to_remove:
+        del potential_floods[id]
+    
+
+    return potential_floods
+
+@timeit
+def generate_alerts(entries, alerts):
+    '''
+    Updates:
+    The alerts list FOR NOW
+    '''
+    for id, entry in entries.items():
+        alert_msg = entry
+        alerts.append(alert_msg)
+    
