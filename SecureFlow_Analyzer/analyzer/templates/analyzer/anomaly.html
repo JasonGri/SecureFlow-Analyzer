@@ -81,17 +81,37 @@
       <h2 class="text-center p-2">DDoS and DoS Alerts</h2>
   </div>
   <div class="row">
-    <div class="col-8">
+    <div class="col-8 vertical-separation">
       {% if not dos_alerts %}
       <p>No DoS/DDoS attempts detected.</p>
       {% else %} 
-      <ul class="list-group">
+      <div class="container-fluid" id="dos-alerts-cont">
         {% for alert in dos_alerts %}
-        <li class="list-group-item">Type of Attack:<strong> {{alert.type}}</strong><br>Src. IP:<strong>{{alert.src_ip}}</strong><br>Dst. IP:<strong> {{alert.dst_ip}}</strong><br>Time: <strong>{{alert.start_time}}</strong><br>{% if alert.count %}Num of packets: <strong>{{alert.count}}</strong>{% endif %}</li>
-        {% endfor %}
-      </ul>
+        <ul class="list-group d-inline-block m-2" id="dos-alerts">
+          <li class="list-group-item text-center" style="color:rgb(192, 16, 16)"><strong>{{alert.type}}</strong></li>
+          <li class="list-group-item">Src. IP:<strong> {{alert.src_ip}}</strong></li>
+          <li class="list-group-item">Dst. IP:<strong> {{alert.dst_ip}}</strong></li>
+          <li class="list-group-item">Time:<strong> {{alert.start_time}}</strong></li>
+          {% if alert.count %}<li class="list-group-item">Num of packets: <strong>{{alert.count}}</strong></li>{% endif %}
+        </ul>
+          {% endfor %}
+      </div>
       {% endif %}
+    </div>
+    <div class="col-4">
+      <h5>The list on the left depicts all the potenital Distributed Denial of Service attacks detected withing the supplied capture file.</h5><br>
+      <h5>Detection includes the following types of attacks:</h5>
+
+      <ol class="list-group list-group-numbered d-inline-block">
+        <li class="list-group-item"><strong>P</strong>ing <strong>o</strong>f <strong>D</strong>eath</li>
+        <li class="list-group-item"><strong>ICMP</strong> Flood</li>
+        <li class="list-group-item"><strong>UDP</strong> Flood</li>
+        <li class="list-group-item"><strong>SYN</strong> Flood</li>
+        <li class="list-group-item"><strong>HTTP</strong> Flood</li>
+      </ol>
+
     </div>
   </div>
 </div>
+<hr class="my-5" />
 {% endblock %}

@@ -124,3 +124,25 @@ hr {
   padding-right: 15px;
 }
 /* Malicious Domains */
+
+/* DDoS Alerts */
+.custom-col-8-5 {
+  width: 70.83%;
+}
+.custom-col-3-5 {
+  width: 29.17%;
+}
+#dos-alerts-cont {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+#dos-alerts {
+  border-style: solid;
+  border-color: var(--body_text);
+}
+
+#dos-alerts li {
+  background-color: var(--table_body_bg);
+  border-style: none;
+}
