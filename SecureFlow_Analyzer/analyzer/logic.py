@@ -560,8 +560,8 @@ def PoD_detect(capture, size_sums, alerts):
                 # Check for ICMP in packet 
                 if ICMP in pkt:
                     ip_layer = pkt[IP]
-                    # Check for the Echo Request only(dont add all the IPv4 fragments or the ICMP replies)
-                    if ip_layer.id == id and pkt[ICMP].type == 8:
+                    # Check for the Echo Request only(dont add all the IPv4 fragments or the ICMP replies) AND a fragmented request to be exact
+                    if ip_layer.id == id and pkt[ICMP].type == 8 and ip_layer.flags == 1:
 
                         src_ip = ip_layer.src
                         dst_ip = ip_layer.dst
