@@ -90,9 +90,10 @@
         <ul class="list-group d-inline-block m-2" id="dos-alerts">
           <li class="list-group-item text-center" style="color:rgb(192, 16, 16)"><strong>{{alert.type}}</strong></li>
           <li class="list-group-item">Src. IP:<strong> {{alert.src_ip}}</strong></li>
-          <li class="list-group-item">Dst. IP:<strong> {{alert.dst_ip}}</strong></li>
+          <li class="list-group-item">Targeted IP:<strong> {{alert.dst_ip}}</strong>{% if alert.dst_port %} Targeted port: <strong>{{alert.dst_port}}</strong>{% endif %}</li>
           <li class="list-group-item">Time:<strong> {{alert.start_time}}</strong></li>
           {% if alert.count %}<li class="list-group-item">Num of packets: <strong>{{alert.count}}</strong></li>{% endif %}
+          {% if alert.size %}<li class="list-group-item">Size of packet: <strong>{{alert.size}}</strong> bytes</li>{% endif %}
         </ul>
           {% endfor %}
       </div>

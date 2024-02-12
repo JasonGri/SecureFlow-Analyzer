@@ -548,7 +548,7 @@ def PoD_detect(capture, size_sums, alerts):
                     dst_ip = pkt[IP].dst
                     timestamp = float(pkt.time)
                     date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                    alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time}
+                    alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time, 'size': pkt_size}
 
                     alerts.append(alert_msg)
 
@@ -567,12 +567,43 @@ def PoD_detect(capture, size_sums, alerts):
                         dst_ip = ip_layer.dst
                         timestamp = float(pkt.time)
                         date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                        alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time}
+                        alert_msg = {'type':'Ping of Death','src_ip':src_ip,'dst_ip':dst_ip, 'start_time':date_time, 'size': sum}
 
                         alerts.append(alert_msg)
 
-# ICMP Flood
-@timeit                        
+# Flood Attacks
+def grouping(pkt, current_group, current_group_start_time, grouped_packets, time_threshold):
+    '''
+    This is a docstring for grouping.
+
+    Parameters:
+    - pkt: Scapy's Packet obj.
+    - current_group: Scapy's PacketList obj
+    - current_group_start_time: A float for timestamp
+    - grouped_packets: An empty list for storing PacketList objs
+    - time_threshold: An integer representing seconds. 
+
+    Returns:
+    A list comprised of PacketList() objects each containing ICMP Echo Requests in time_threshold groups.
+    '''   
+
+    if current_group_start_time is None:
+        # 1st Initialization
+        current_group.append(pkt)
+        current_group_start_time = pkt.time
+    elif pkt.time - current_group_start_time > time_threshold:
+        # Threshold is exceeded
+        grouped_packets.append(current_group)  # Group to list of groups
+        current_group = PacketList()  # Create new group
+        current_group.append(pkt)  # Add that pkt to new group
+        current_group_start_time = pkt.time  # Initialize time of new group
+    else:
+        # Threshold not exceeded
+        current_group.append(pkt)
+
+    return current_group, current_group_start_time, grouped_packets
+
+@timeit
 def time_group(capture, time_threshold):
     '''
     This is a docstring for time_group.
@@ -582,7 +613,7 @@ def time_group(capture, time_threshold):
     - time_threshold: An integer representing seconds. 
 
     Returns:
-    A list comprised of PacketList() objects each containing ICMP Echo Requests in time_threshold groups.
+    A list comprised of PacketList() objects each containing groups based on protocols and time_threshold.
     '''   
     grouped_packets = []
 
@@ -592,39 +623,32 @@ def time_group(capture, time_threshold):
     current_group = PacketList()
     current_group_start_time = None
 
-
     for pkt in sorted_packets:
         # Check for ICMP packets
         if ICMP in pkt:
             icmp_layer = pkt[ICMP]
             # Filter for Echo Request ICMP packets
             if icmp_layer.type == 8:
-
-                # 1st Initialization
-                if current_group_start_time == None:    
-                    current_group.append(pkt)
-                    current_group_start_time = pkt.time
-                
-                # Threshold is exceeded
-                elif (pkt.time - current_group_start_time > time_threshold):
-                    grouped_packets.append(current_group) # Group to list of groups
-                    current_group = PacketList()# Create new group
-                    current_group.append(pkt) # Add that pkt to new group
-                    current_group_start_time = pkt.time # Initialize time of new group
-
-                # Threshold not exceeded
-                else:
-                    current_group.append(pkt)
-
+               current_group, current_group_start_time, grouped_packets = grouping(pkt, current_group, current_group_start_time, grouped_packets, time_threshold)
+        # Check for UDP packets
+        if UDP in pkt:
+            current_group, current_group_start_time, grouped_packets = grouping(pkt, current_group, current_group_start_time, grouped_packets, time_threshold)
+        # Check for TCP packets
+        if TCP in pkt:
+            tcp_layer = pkt[TCP]
+            # Filter for SYN tcp packets
+            if tcp_layer.flags == 'S':
+                current_group, current_group_start_time, grouped_packets = grouping(pkt, current_group, current_group_start_time, grouped_packets, time_threshold)
+        
     # Append last group
     grouped_packets.append(current_group)
     
-    return grouped_packets
+    return grouped_packets        
 
 @timeit
-def icmp_flood_detect(time_groups, pkt_threshold):
+def flood_detect(time_groups, pkt_threshold):
     '''
-    This is a docstring for icmp_flood_detect.
+    This is a docstring for flood_detect.
 
     Parameters:
     - time_groups: List of PacketList() objects.
@@ -643,13 +667,17 @@ def icmp_flood_detect(time_groups, pkt_threshold):
             timestamp = float(pkt.time)
             date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
+            dst_port = ip_layer.dport if TCP in pkt else None
+
+            proto = PROTOCOL_NUMS[ip_layer.proto]
+
 
             # Set potential flood identifier
             flood_id = f'{src_ip}{dst_ip}{group_num}' # Takes into account src, dst, and time
 
             # Add flood entry if it doesnt exist
             if flood_id not in potential_floods:
-                potential_floods[flood_id] = {'type':'ICMP Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'start_time': date_time, 'count': 1}
+                potential_floods[flood_id] = {'type':f'{proto} Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'dst_port': dst_port,'start_time': date_time, 'count': 1}
             else:
                 # Increase pkt counter otherwise
                 potential_floods[flood_id]['count'] += 1

@@ -71,9 +71,9 @@ def index(req):
             offset_dict = get_offsets(capture)
             frag_sums = get_total_size(capture, offset_dict)
             PoD_detect(capture, frag_sums, dos_alerts)
-            # ICMP Flood
+            # Flood Attacks
             groups = time_group(capture, 1)
-            floods = icmp_flood_detect(groups, 1000)
+            floods = flood_detect(groups, 1000)
             generate_alerts(floods, dos_alerts)
 
             context['anomaly']['dos_alerts'] = dos_alerts
