@@ -79,3 +79,11 @@ serviceBtns.forEach((btn) => {
     e.target.classList.toggle("active");
   });
 });
+
+// Port Scans
+const portScans = document.getElementById("scan-ports");
+const portsBtn = document.getElementById("port-btn");
+
+portsBtn.addEventListener("click", (e) => {
+  portScans.classList.toggle("hide");
+});

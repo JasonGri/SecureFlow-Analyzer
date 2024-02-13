@@ -1,5 +1,5 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
-<h1 class="text-center">These are the Anomalies observed:</h1>
+<h1 class="text-center m-3">These are the Anomalies observed:</h1>
 <div class="container-fluid">
   <!-- 1st Headings Row -->
   <div class="row">
@@ -103,28 +103,36 @@
     </div>
     <div class="col-4">
       <h5>The list on the left depicts all the potenital Distributed Denial of Service attacks detected withing the supplied capture file.</h5><br>
-      <h5>Detection includes the following types of attacks:</h5>
-
-      <ol class="list-group list-group-numbered d-inline-block">
-        <li class="list-group-item"><strong>P</strong>ing <strong>o</strong>f <strong>D</strong>eath</li>
-        <li class="list-group-item"><strong>ICMP</strong> Flood</li>
-        <li class="list-group-item"><strong>UDP</strong> Flood</li>
-        <li class="list-group-item"><strong>SYN</strong> Flood</li>
-        <li class="list-group-item"><strong>HTTP</strong> Flood</li>
-      </ol>
-
+      
+      <div class="row">
+        <div class="col-8">
+          <h5>Detection includes the following types of attacks:</h5>
+        </div>
+        
+        <div class="col-4">
+          <ol class="list-group list-group-numbered d-inline-block mt-4">
+            <li class="list-group-item"><strong>P</strong>ing <strong>o</strong>f <strong>D</strong>eath</li>
+            <li class="list-group-item"><strong>ICMP</strong> Flood</li>
+            <li class="list-group-item"><strong>UDP</strong> Flood</li>
+            <li class="list-group-item"><strong>SYN</strong> Flood</li>
+            <li class="list-group-item"><strong>HTTP</strong> Flood</li>
+          </ol>
+        </div>
+      </div>
+        
     </div>
   </div>
   <hr class="my-5" />
   <!-- 3rd Headings Row -->
   <div class="row">
-    <div class="col-8">
+    <div class="col-6">
       <h2 class="text-center p-2">Port Scanning Attempts</h2>
     </div>
   </div>
   <!-- Port Scans -->
   <div class="row">
-    <div class="col-8 vertical-separation">
+    <div class="col-6 vertical-separation">
+      <h5>The following blocks depict any potenital Port Scans which took place within the supplied capture file.</h5>
       {% if not scan_alerts %}
       <p>No port scans detected.</p>
       {% else %} 
@@ -134,12 +142,34 @@
           <li class="list-group-item">Src. IP:<strong> {{alert.src_ip}}</strong></li>
           <li class="list-group-item">Targeted IP:<strong> {{alert.dst_ip}}</strong></li>
           <li class="list-group-item">Time:<strong> {{alert.start_time}}</strong></li>
-          <li class="list-group-item">Ports Scanned: {% with alert.dst_ports|length as num_of_ports %}<strong>{{ num_of_port }}</strong>{% endwith %}
-        {{alert.dst_ports|length}}</li>
+          <li class="list-group-item">
+            Ports Scanned: 
+            {% with alert.dst_ports|length as num_of_ports %}
+            <strong>{{ num_of_ports }}</strong> <button class="btn service-btn mx-3" id="port-btn">Show</button>
+            {% endwith %}
+          <div class="container-fluid hide m-2" id="scan-ports">
+            {% for port in alert.dst_ports %} 
+              <u>{{port}}</u>,
+            {%endfor%}
+          </div>
+          </li>
         </ul>
           {% endfor %}
       </div>
       {% endif %}
+      <div class="row ">
+        <div class="custom-col-8-5">
+          <h5 class="my-4">The Threshold values considered during analysis are the following: </h5>
+        </div>
+        <div class="custom-col-3-5">
+          <!-- TODO: Make this dynamic based on the values the user entered or not -->
+          <ol class="list-group list-group-numbered d-inline-block mt-4">
+            <li class="list-group-item"><strong>Time</strong> Threshold: <u>1sec</u></li>
+            <li class="list-group-item"><strong>Port</strong> Threshold: <u> &gt;1</u></li>
+          </ol>
+        </div>
+          
+      </div>
     </div>
   </div>
 </div>

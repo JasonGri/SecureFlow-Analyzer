@@ -146,3 +146,16 @@ hr {
   background-color: var(--table_body_bg);
   border-style: none;
 }
+
+/* Port scans */
+/* Use the same visual effects as service btn */
+
+.hide {
+  display: none;
+}
+
+#scan-ports {
+  border-style: solid;
+  border-color: var(--body_text);
+  border-width: 2px;
+}
