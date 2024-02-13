@@ -79,7 +79,9 @@
   <div class="row">
     <div class="col-8">
       <h2 class="text-center p-2">DDoS and DoS Alerts</h2>
+    </div>
   </div>
+  <!-- DoS Attacks -->
   <div class="row">
     <div class="col-8 vertical-separation">
       {% if not dos_alerts %}
@@ -113,6 +115,33 @@
 
     </div>
   </div>
+  <hr class="my-5" />
+  <!-- 3rd Headings Row -->
+  <div class="row">
+    <div class="col-8">
+      <h2 class="text-center p-2">Port Scanning Attempts</h2>
+    </div>
+  </div>
+  <!-- Port Scans -->
+  <div class="row">
+    <div class="col-8 vertical-separation">
+      {% if not scan_alerts %}
+      <p>No port scans detected.</p>
+      {% else %} 
+      <div class="container-fluid" id="dos-alerts-cont">
+        {% for alert in scan_alerts %}
+        <ul class="list-group d-inline-block m-2" id="dos-alerts">
+          <li class="list-group-item">Src. IP:<strong> {{alert.src_ip}}</strong></li>
+          <li class="list-group-item">Targeted IP:<strong> {{alert.dst_ip}}</strong></li>
+          <li class="list-group-item">Time:<strong> {{alert.start_time}}</strong></li>
+          <li class="list-group-item">Ports Scanned: {% with alert.dst_ports|length as num_of_ports %}<strong>{{ num_of_port }}</strong>{% endwith %}
+        {{alert.dst_ports|length}}</li>
+        </ul>
+          {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
-<hr class="my-5" />
+
 {% endblock %}

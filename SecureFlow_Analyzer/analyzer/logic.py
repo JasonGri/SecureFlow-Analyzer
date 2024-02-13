@@ -23,6 +23,7 @@ import ipinfo
 import requests
 from ipaddress import IPv6Address, IPv6Network 
 from itertools import islice
+from decimal import Decimal
 
 @timeit
 def get_capture(file_path):
@@ -591,7 +592,8 @@ def grouping(pkt, current_group, current_group_start_time, grouped_packets, time
         # 1st Initialization
         current_group.append(pkt)
         current_group_start_time = pkt.time
-    elif pkt.time - current_group_start_time > time_threshold:
+    # Perform floating operations with Decimal to avoid precision errors
+    elif Decimal(pkt.time) - Decimal(current_group_start_time) > time_threshold:
         # Threshold is exceeded
         grouped_packets.append(current_group)  # Group to list of groups
         current_group = PacketList()  # Create new group
@@ -655,32 +657,33 @@ def flood_detect(time_groups, pkt_threshold):
     - pkt_threshold: An integer representing number of packets threshold. 
 
     Returns:
-    A list comprised of dictionaries with src_ip, dst_ip, domain_name, and datetime of the incident.
+    A dictionary comprised of dictionaries with type_of_attack, src_ip, dst_ip, dst_port, and datetime of the incident, (num of packets).
     '''
     potential_floods = {}
     for group in time_groups:
         group_num = time_groups.index(group)
         for pkt in group:
-            ip_layer = pkt[IP]
-            src_ip = ip_layer.src
-            dst_ip = ip_layer.dst
-            timestamp = float(pkt.time)
-            date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            if IP in pkt:
+                ip_layer = pkt[IP]
+                src_ip = ip_layer.src
+                dst_ip = ip_layer.dst
+                timestamp = float(pkt.time)
+                date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-            dst_port = ip_layer.dport if TCP in pkt else None
+                dst_port = ip_layer.dport if TCP in pkt else None
 
-            proto = PROTOCOL_NUMS[ip_layer.proto]
+                proto = PROTOCOL_NUMS[ip_layer.proto]
 
 
-            # Set potential flood identifier
-            flood_id = f'{src_ip}{dst_ip}{group_num}' # Takes into account src, dst, and time
+                # Set potential flood identifier
+                flood_id = f'{src_ip}{dst_ip}{group_num}' # Takes into account src, dst, and time
 
-            # Add flood entry if it doesnt exist
-            if flood_id not in potential_floods:
-                potential_floods[flood_id] = {'type':f'{proto} Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'dst_port': dst_port,'start_time': date_time, 'count': 1}
-            else:
-                # Increase pkt counter otherwise
-                potential_floods[flood_id]['count'] += 1
+                # Add flood entry if it doesnt exist
+                if flood_id not in potential_floods:
+                    potential_floods[flood_id] = {'type':f'{proto} Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'dst_port': dst_port,'start_time': date_time, 'count': 1}
+                else:
+                    # Increase pkt counter otherwise
+                    potential_floods[flood_id]['count'] += 1
 
     # Gather all keys of the values that do not surpass the threshold   
     entries_to_remove = []
@@ -706,3 +709,56 @@ def generate_alerts(entries, alerts):
         alert_msg = entry
         alerts.append(alert_msg)
     
+#---------------------Port Scans-----------------
+@timeit
+def port_scan_detect(time_groups, port_threshold):
+    '''
+    This is a docstring for port_scan_detect.
+
+    Parameters:
+    - time_groups: List of PacketList() objects.
+    - port_threshold: An integer representing number of ports threshold. 
+
+    Returns:
+    A dictionary comprised of dictionaries with src_ip, dst_ip, dst_ports(list), and datetime of the incident.
+    '''
+    port_scans = {}
+
+    # Group ports targeted by IPs initiating SYN requests 
+    for group in time_groups:
+        group_num = time_groups.index(group)
+        for pkt in group:
+            if TCP in pkt:
+                ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+                src_ip = ip_layer.src
+                dst_ip = ip_layer.dst
+                dst_port = ip_layer.dport
+                timestamp = float(pkt.time)
+                date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+                tcp_layer = pkt[TCP]
+                # If TCP SYN request is sent add dst port to lst
+                if tcp_layer.flags == 0x02:
+
+                    # Set potential flood identifier
+                    scan_id = f'{src_ip}{dst_ip}{group_num}'
+                    # Add src ip and its trageted destination ports
+                    if scan_id not in port_scans:
+                        port_scans[scan_id] = {'src_ip':src_ip, 'dst_ip': dst_ip, 'dst_ports':[dst_port], 'start_time': date_time }
+                    else:
+                        port_lst =  port_scans[scan_id]['dst_ports']
+                        if dst_port not in port_lst:
+                            port_lst.append(dst_port)
+
+
+    # Gather all keys of the values that do not surpass the threshold 
+    entries_to_remove = []
+    for id, details in port_scans.items():
+        if len(details['dst_ports']) <= port_threshold:
+            entries_to_remove.append(id)
+
+    # Remove those entries
+    for id in entries_to_remove:
+        del port_scans[id]
+
+    return port_scans

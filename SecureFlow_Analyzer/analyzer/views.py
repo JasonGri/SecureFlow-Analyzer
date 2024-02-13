@@ -77,6 +77,14 @@ def index(req):
             generate_alerts(floods, dos_alerts)
 
             context['anomaly']['dos_alerts'] = dos_alerts
+            
+            # Port Scans
+            scan_alerts = []
+            groups = time_group(capture, 1)
+            scans = port_scan_detect(groups, 1)
+            generate_alerts(scans, scan_alerts)
+
+            context['anomaly']['scan_alerts'] = scan_alerts
 
             #Sets context in session for transfer to other views
             req.session['context'] = context
