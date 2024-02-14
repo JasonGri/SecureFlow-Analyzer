@@ -670,6 +670,7 @@ def flood_detect(time_groups, pkt_threshold):
                 timestamp = float(pkt.time)
                 date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
+                # Destination port is almost always specific
                 dst_port = ip_layer.dport if TCP in pkt else None
 
                 proto = PROTOCOL_NUMS[ip_layer.proto]
@@ -680,10 +681,14 @@ def flood_detect(time_groups, pkt_threshold):
 
                 # Add flood entry if it doesnt exist
                 if flood_id not in potential_floods:
-                    potential_floods[flood_id] = {'type':f'{proto} Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'dst_port': dst_port,'start_time': date_time, 'count': 1}
+                    potential_floods[flood_id] = {'type':f'{proto} Flood', 'src_ip': src_ip, 'dst_ip': dst_ip, 'dst_ports': [dst_port],'start_time': date_time, 'count': 1}
                 else:
                     # Increase pkt counter otherwise
                     potential_floods[flood_id]['count'] += 1
+                    # Add dst_port if it isnt in list
+                    port_lst =potential_floods[flood_id]['dst_ports'] 
+                    if dst_port not in port_lst:
+                        port_lst.append(dst_port)
 
     # Gather all keys of the values that do not surpass the threshold   
     entries_to_remove = []
@@ -691,10 +696,13 @@ def flood_detect(time_groups, pkt_threshold):
         if flood['count'] < pkt_threshold:
             # Remove flood entry withing threshold
             entries_to_remove.append(id)
+        # Need to check for port scan cases(1:N) and remove them
+        if len(flood['dst_ports']) > 1: 
+            entries_to_remove.append(id)
 
     # Remove those entries
     for id in entries_to_remove:
-        del potential_floods[id]
+        potential_floods.pop(id, None)
     
 
     return potential_floods
@@ -759,6 +767,6 @@ def port_scan_detect(time_groups, port_threshold):
 
     # Remove those entries
     for id in entries_to_remove:
-        del port_scans[id]
+        port_scans.pop(id, None)
 
     return port_scans
