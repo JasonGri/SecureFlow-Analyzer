@@ -155,22 +155,26 @@
           <li class="list-group-item">
             Ports Scanned: 
             {% with alert.dst_ports|length as num_of_ports %}
-            <strong>{{ num_of_ports }}</strong> <button class="btn service-btn mx-3" id="port-btn" type="button">Show <img
-              src="{% static 'svgIcons/caret-up.svg' %}"
-              alt="collapse-caret"
-              width="30"
-              height="24"
-              class="d-inline-block align-text-top svg filter-white"
-            /></button>
+              <strong>{{ num_of_ports }}</strong>
+              <button class="btn service-btn mx-3 port-btn" type="button">
+                Show 
+                <img
+                src="{% static 'svgIcons/caret-up.svg' %}"
+                alt="collapse-caret"
+                width="30"
+                height="24"
+                class="d-inline-block align-text-top svg filter-white"
+                />
+              </button>
             {% endwith %}
-          <div class="container-fluid hide m-2" id="scan-ports">
-            {% for port in alert.dst_ports %} 
-              <u>{{port}}</u>,
-            {%endfor%}
-          </div>
+            <div class="container-fluid hide m-2">
+              {% for port in alert.dst_ports %} 
+                <u>{{port}}</u>,
+              {%endfor%}
+            </div>
           </li>
         </ul>
-          {% endfor %}
+        {% endfor %}
       </div>
       <div class="row mt-4 justify-content-center">
         <div class="col-6 text-center">

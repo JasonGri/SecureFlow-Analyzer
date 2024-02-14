@@ -100,11 +100,24 @@ serviceBtns.forEach((btn) => {
 });
 
 // Port Scans
-const portScans = document.getElementById("scan-ports");
-const portsBtn = document.getElementById("port-btn");
+const portsBtns = document.querySelectorAll(".port-btn");
 
-if (portsBtn) {
-  portsBtn.addEventListener("click", (e) => {
-    portScans.classList.toggle("hide");
+portsBtns.forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    var clickedElement;
+    if (e.target === btn) {
+      clickedElement = e.target;
+    } else {
+      clickedElement = e.target.parentElement;
+    }
+
+    clickedElement.nextElementSibling.classList.toggle("hide");
+    var imgSrc = clickedElement.lastElementChild.src;
+    console.log(imgSrc);
+    if (imgSrc === caretUp) {
+      clickedElement.lastElementChild.src = caretDown;
+    } else {
+      clickedElement.lastElementChild.src = caretUp;
+    }
   });
-}
+});
