@@ -16,6 +16,12 @@ def index(req):
             pcap_file = req.FILES['pcap_file']
             file_path = 'media/' + default_storage.save(f'pcap_files/{pcap_file.name}', pcap_file) # second half only returns the relative file path
 
+            # Extract specific threshold values if provided
+            dos_pkt_thres = form.cleaned_data['dos_pkt_thres']
+            dos_time_thres = form.cleaned_data['dos_time_thres']
+            scan_port_thres = form.cleaned_data['scan_port_thres']
+            scan_time_thres = form.cleaned_data['scan_time_thres']
+
             # Extract PacketList from pcap
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 future = executor.submit(get_capture, file_path)
@@ -36,7 +42,12 @@ def index(req):
                     'conversations': convos,
                     'ip_coords': ip_coords
                 },
-                'anomaly':{}
+                'anomaly':{
+                    'dos_pkt_thres' : dos_pkt_thres,
+                    'dos_time_thres' : dos_time_thres,
+                    'scan_port_thres' : scan_port_thres,
+                    'scan_time_thres' : scan_time_thres,
+                }
             }
 
             # Make sure not to plot an empty dict
@@ -72,16 +83,16 @@ def index(req):
             frag_sums = get_total_size(capture, offset_dict)
             PoD_detect(capture, frag_sums, dos_alerts)
             # Flood Attacks
-            groups = time_group(capture, 1)
-            floods = flood_detect(groups, 1000)
+            groups = time_group(capture, dos_time_thres)
+            floods = flood_detect(groups, dos_pkt_thres)
             generate_alerts(floods, dos_alerts)
 
             context['anomaly']['dos_alerts'] = dos_alerts
             
             # Port Scans
             scan_alerts = []
-            groups = time_group(capture, 1)
-            scans = port_scan_detect(groups, 1)
+            groups = time_group(capture, scan_time_thres)
+            scans = port_scan_detect(groups, scan_port_thres)
             generate_alerts(scans, scan_alerts)
 
             context['anomaly']['scan_alerts'] = scan_alerts

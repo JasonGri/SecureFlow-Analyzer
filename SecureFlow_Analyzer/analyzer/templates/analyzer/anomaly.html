@@ -17,7 +17,7 @@
     <!-- Vulnerable Services -->
     <div class="col-4 text-center vertical-separation">
       {% if not vuln_services %}
-      <p>No vulnerable services detected.</p>
+      <h4 class="positive-results">No vulnerable services detected.</h4>
       {% else %} {% for service, entry_lst in vuln_services.items %}
 
       <button
@@ -43,7 +43,7 @@
     <!-- Malicious Domains -->
     <div class="col-4 vertical-separation">
       {% if not sus_dom_entries %}
-      <p>No malicious domains detected.</p>
+      <h4 class="positive-results">No malicious domains detected.</h4>
       {% else %}
       <div class="card overflow-auto">
         {% for entry in sus_dom_entries %}
@@ -59,7 +59,7 @@
     <!-- Malicious IPs -->
     <div class="col-4">
       {% if not sus_ip_entries %}
-      <p>No Malcious IP addresses detected.</p>
+      <h4 class="positive-results">No Malcious IP addresses detected.</h4>
       {% else %}
       <div class="card overflow-auto">
         {% for entry in sus_ip_entries %}
@@ -85,7 +85,7 @@
   <div class="row">
     <div class="col-8 vertical-separation">
       {% if not dos_alerts %}
-      <p>No DoS/DDoS attempts detected.</p>
+      <h4 class="positive-results">No DoS/DDoS attempts detected.</h4>
       {% else %} 
       <div class="container-fluid" id="dos-alerts-cont">
         {% for alert in dos_alerts %}
@@ -104,21 +104,31 @@
     <div class="col-4">
       <h5>The list on the left depicts all the potenital Distributed Denial of Service attacks detected withing the supplied capture file.</h5><br>
       
-      <div class="row">
+      <div class="row mt-3 justify-content-center">
         <div class="col-8">
-          <h5>Detection includes the following types of attacks:</h5>
-        </div>
-        
-        <div class="col-4">
-          <ol class="list-group list-group-numbered d-inline-block mt-4">
-            <li class="list-group-item"><strong>P</strong>ing <strong>o</strong>f <strong>D</strong>eath</li>
-            <li class="list-group-item"><strong>ICMP</strong> Flood</li>
-            <li class="list-group-item"><strong>UDP</strong> Flood</li>
-            <li class="list-group-item"><strong>SYN</strong> Flood</li>
-            <li class="list-group-item"><strong>HTTP</strong> Flood</li>
-          </ol>
+          <h5>Detection includes the following types of attacks:          
+            <ol class="list-group list-group-numbered text-center mt-2">
+              <li class="list-group-item"><strong>P</strong>ing <strong>o</strong>f <strong>D</strong>eath</li>
+              <li class="list-group-item"><strong>ICMP</strong> Flood</li>
+              <li class="list-group-item"><strong>UDP</strong> Flood</li>
+              <li class="list-group-item"><strong>SYN</strong> Flood</li>
+              <li class="list-group-item"><strong>HTTP</strong> Flood</li>
+            </ol>
+          </h5>
         </div>
       </div>
+        
+      <div class="row mt-3 justify-content-center">
+        <div class="col-8">
+          <h5>The Threshold values considered during analysis are the following: 
+            <ol class="list-group list-group-numbered text-center mt-2">
+            <li class="list-group-item"><strong>Time</strong> Threshold: <u>{{dos_time_thres}}</u> sec</li>
+            <li class="list-group-item"><strong>Packet</strong> Threshold: <strong>&gt;</strong> <u>{{dos_pkt_thres}}</u></li>
+          </ol>
+        </h5>
+        </div>
+      </div>
+      
         
     </div>
   </div>
@@ -134,7 +144,7 @@
     <div class="col-6 vertical-separation">
       <h5>The following blocks depict any potenital Port Scans which took place within the supplied capture file.</h5>
       {% if not scan_alerts %}
-      <p>No port scans detected.</p>
+      <h4 class="positive-results">No port scans detected.</h4>
       {% else %} 
       <div class="container-fluid" id="dos-alerts-cont">
         {% for alert in scan_alerts %}
@@ -145,7 +155,13 @@
           <li class="list-group-item">
             Ports Scanned: 
             {% with alert.dst_ports|length as num_of_ports %}
-            <strong>{{ num_of_ports }}</strong> <button class="btn service-btn mx-3" id="port-btn">Show</button>
+            <strong>{{ num_of_ports }}</strong> <button class="btn service-btn mx-3" id="port-btn" type="button">Show <img
+              src="{% static 'svgIcons/caret-up.svg' %}"
+              alt="collapse-caret"
+              width="30"
+              height="24"
+              class="d-inline-block align-text-top svg filter-white"
+            /></button>
             {% endwith %}
           <div class="container-fluid hide m-2" id="scan-ports">
             {% for port in alert.dst_ports %} 
@@ -156,20 +172,17 @@
         </ul>
           {% endfor %}
       </div>
-      {% endif %}
-      <div class="row ">
-        <div class="custom-col-8-5">
-          <h5 class="my-4">The Threshold values considered during analysis are the following: </h5>
-        </div>
-        <div class="custom-col-3-5">
-          <!-- TODO: Make this dynamic based on the values the user entered or not -->
-          <ol class="list-group list-group-numbered d-inline-block mt-4">
-            <li class="list-group-item"><strong>Time</strong> Threshold: <u>1sec</u></li>
-            <li class="list-group-item"><strong>Port</strong> Threshold: <u> &gt;1</u></li>
+      <div class="row mt-4 justify-content-center">
+        <div class="col-6 text-center">
+          <h5>The Threshold values considered during analysis are the following: </h5>
+
+          <ol class="list-group list-group-numbered mt-2">
+            <li class="list-group-item"><strong>Time</strong> Threshold: <u>{{scan_time_thres}} sec</u></li>
+            <li class="list-group-item"><strong>Port</strong> Threshold: <u> &gt; {{scan_port_thres}}</u></li>
           </ol>
         </div>
-          
       </div>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -2,21 +2,118 @@
 <h1 class="text-center p-4">Welcome to SecureFlow Analyzer!</h1>
 
 <!-- TODO: Add progress bar will uploading file -->
-<div class="container mt-5">
+
+<div class="container mt-4">
   <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <!-- Choose a file -->
-    <div class="mb-3">
-      <label for="{{form.pcap_file.id_for_label}}" class="form-label"
-        >{{form.pcap_file.label}}</label
-      >
-      <input
-        type="file"
-        name="{{ form.pcap_file.name }}"
-        class="form-control"
-        id="{{ form.pcap_file.id_for_label }}"
-      />
+    {%csrf_token%}
+    <!-- File Upload -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <label for="{{form.pcap_file.id_for_label}}" class="form-label"
+          >{{form.pcap_file.label}}</label
+        >
+        <input
+          type="file"
+          name="{{ form.pcap_file.name }}"
+          class="form-control"
+          id="{{ form.pcap_file.id_for_label }}"
+        />
+      </div>
     </div>
+    <!-- Advanced Options -->
+    <div class="row">
+      <div class="col-12">
+        <button type="button" class="btn btn-dark mb-2" id="advanced-btn">
+          Advanced
+          <img
+            src="{% static 'svgIcons/caret-down.svg' %}"
+            alt="advance-caret"
+            width="30"
+            height="24"
+            class="svg filter-white"
+          />
+        </button>
+        <div class="card mb-3 hide" id="variables-container">
+          <div class="card-header"
+            >Please provide any specific options for detection:</div
+          >
+          <div class="card-body">
+            <!-- Header Row -->
+            <div class="row">
+              <div class="col-4">
+                <h5 class="text-center">DoS Options</h5>
+              </div>
+              <div class="col-4">
+                <h5 class="text-center">Port Scan Options</h5>
+              </div>
+            </div>
+            <!-- Options Row -->
+            <div class="row">
+              <!-- DoS Specifications -->
+              <div class="col-2">
+                <label
+                  for="{{ form.dos_pkt_thres.id_for_label }}"
+                  class="form-label"
+                  >{{ form.dos_pkt_thres.label }}</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="{{ form.dos_pkt_thres.name }}"
+                  id="{{ form.dos_pkt_thres.id_for_label }}"
+                  value="1000"
+                />
+              </div>
+              <div class="col-2 vertical-separation">
+                <label
+                for="{{ form.dos_time_thres.id_for_label }}"
+                class="form-label"
+                >{{ form.dos_time_thres.label }}</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="{{ form.dos_time_thres.name }}"
+                  id="{{ form.dos_time_thres.id_for_label }}"
+                  value="1"
+                />
+              </div>
+
+              <!-- Port Scan Specifications -->
+              <div class="col-2 vertical-separation">
+                <label
+                for="{{ form.scan_port_thres.id_for_label }}"
+                class="form-label"
+                >{{ form.scan_port_thres.label }}</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="{{ form.scan_port_thres.name }}"
+                  id="{{ form.scan_port_thres.id_for_label }}"
+                  value="1"
+                />
+              </div>
+              <div class="col-2 vertical-separation">
+                <label
+                for="{{ form.scan_time_thres.id_for_label }}"
+                class="form-label"
+                >{{ form.scan_time_thres.label }}</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="{{ form.scan_time_thres.name }}"
+                  id="{{ form.scan_time_thres.id_for_label }}"
+                  value="1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Upload Button -->
     <div class="d-grid gap-2 col-6 mx-auto">
       <button id="upload-btn" class="btn btn-dark" type="submit">Upload</button>
       <button
@@ -31,7 +128,7 @@
         ></span>
         <span role="status">Uploading...</span>
       </button>
-    </div>
+
   </form>
 </div>
 {% endblock %}

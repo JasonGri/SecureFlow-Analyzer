@@ -11,6 +11,25 @@ if (uploadBtn) {
   });
 }
 
+// Advanced Button
+const advancedBtn = document.getElementById("advanced-btn");
+const caretUp = "http://127.0.0.1:8000/static/svgIcons/caret-up.svg";
+const caretDown = "http://127.0.0.1:8000/static/svgIcons/caret-down.svg";
+
+const varContainer = document.getElementById("variables-container");
+
+if (advancedBtn) {
+  advancedBtn.addEventListener("click", (e) => {
+    varContainer.classList.toggle("hide");
+    var imgSrc = advancedBtn.lastElementChild.src;
+    if (imgSrc === caretUp) {
+      advancedBtn.lastElementChild.src = caretDown;
+    } else {
+      advancedBtn.lastElementChild.src = caretUp;
+    }
+  });
+}
+
 // Shorting of Conversations Table
 // Formatting Bytes
 function formatBytes(bytes) {
@@ -84,6 +103,8 @@ serviceBtns.forEach((btn) => {
 const portScans = document.getElementById("scan-ports");
 const portsBtn = document.getElementById("port-btn");
 
-portsBtn.addEventListener("click", (e) => {
-  portScans.classList.toggle("hide");
-});
+if (portsBtn) {
+  portsBtn.addEventListener("click", (e) => {
+    portScans.classList.toggle("hide");
+  });
+}

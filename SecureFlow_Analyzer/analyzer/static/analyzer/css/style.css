@@ -28,6 +28,8 @@
   /* buttons */
   --btn: #4252a3;
   --btn_act: #aab8ff;
+  /* Result Messages */
+  --positive: #27ae60;
 }
 
 body {
@@ -103,6 +105,11 @@ hr {
 }
 
 /* Vulnerable Services */
+.positive-results {
+  color: var(--positive);
+  text-align: center;
+}
+
 .service-btn {
   background-color: var(--btn);
   color: #ffffff;
