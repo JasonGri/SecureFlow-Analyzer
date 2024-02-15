@@ -113,7 +113,7 @@ portsBtns.forEach((btn) => {
 
     clickedElement.nextElementSibling.classList.toggle("hide");
     var imgSrc = clickedElement.lastElementChild.src;
-    console.log(imgSrc);
+
     if (imgSrc === caretUp) {
       clickedElement.lastElementChild.src = caretDown;
     } else {
