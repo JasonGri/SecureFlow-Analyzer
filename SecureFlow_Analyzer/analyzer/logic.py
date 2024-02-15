@@ -30,7 +30,7 @@ def get_capture(file_path):
     return rdpcap(file_path)
 
 #**************************ANALYSIS****************************
-#--------------------PROTOCOL DISTRIBUTION---------------------
+#--------------------PROTOCOL/ SERVICE DISTRIBUTION---------------------
 @timeit
 def get_protocols(capture):
     '''
@@ -62,21 +62,65 @@ def get_protocols(capture):
     return dict(proto_counter)
 
 @timeit
+def get_services(capture):
+    '''
+    This is a docstring for get_services.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+
+    Returns:
+    A dictionary with keys and values as SERVICES utilized and OCCURENCES of each respectively.
+    '''
+    service_counter = Counter()
+    service_list = []
+
+    for pkt in capture:
+        # Check if packet has TCP or UDP layer for a service port
+        if pkt.haslayer(TCP) or pkt.haslayer(UDP):
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+
+            src_port = resolve_service(ip_layer.sport)
+            dst_port = resolve_service(ip_layer.dport)
+
+            # In case the services was not resolved from the port number add "Unresolved"
+            service_list.append(src_port if type(src_port) != int else 'Unresolved')
+
+            service_list.append(dst_port if type(dst_port) != int else 'Unresolved')
+    
+    
+    # Count the occurrences of each service in the list
+    service_counter.update(service_list)
+    return dict(service_counter)
+
+@timeit
 def visualize_protocols(proto_dict):
 
     data = pd.DataFrame(list(proto_dict.items()), columns=['Protocols', 'Occurrences'])
 
-    # Plot Bar chart
-    fig1 = px.bar(data, x='Protocols', y='Occurrences', color='Protocols', log_y=True)
+    # # Plot Bar chart
+    # fig1 = px.bar(data, x='Protocols', y='Occurrences', color='Protocols', log_y=True)
 
-    fig1.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
+    # fig1.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
 
     # Plot Pie Chart
     fig2 = px.pie(data, values='Occurrences', names='Protocols', color='Protocols')
 
     fig2.update_layout(plot_bgcolor=PLOT_BG_COLOR,  paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
 
-    return fig1.to_html(), fig2.to_html()
+    return fig2.to_html()
+
+@timeit
+def visualize_services(service_dict):
+
+    data = pd.DataFrame(list(service_dict.items()), columns=['Services', 'Occurrences'])
+
+    # Plot Bar chart
+    fig1 = px.bar(data, x='Services', y='Occurrences', color='Services', log_y=True)
+
+    fig1.update_layout(plot_bgcolor=PLOT_BG_COLOR, paper_bgcolor=PAPER_BG_COLOR, font_color=CHART_FONT_COLOR, margin=dict(l=20, r=20, t=20, b=20))
+
+    return fig1.to_html()
 
 #--------------------BANDWIDTH UTILIZATION---------------------
 @timeit

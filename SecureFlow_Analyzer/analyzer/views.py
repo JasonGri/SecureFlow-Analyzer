@@ -30,6 +30,7 @@ def index(req):
 
             #TODO: Run analysis and assign results to context
             protocols = get_protocols(capture)
+            services = get_services(capture)
             convos = get_convos(capture)
             top_talkers = get_top_talkers(capture)
             band_traffic = get_traffic(capture)
@@ -39,6 +40,7 @@ def index(req):
             context = {
                 'analysis':{
                     'protocols': protocols,
+                    'services': services,
                     'conversations': convos,
                     'ip_coords': ip_coords
                 },
@@ -52,9 +54,12 @@ def index(req):
 
             # Make sure not to plot an empty dict
             if len(protocols) != 0:
-                proto_graph_bar, proto_graph_pie = visualize_protocols(protocols)
-                context['analysis']['proto_graph_bar'] = proto_graph_bar
+                proto_graph_pie = visualize_protocols(protocols)
                 context['analysis']['proto_graph_pie'] = proto_graph_pie
+
+            if len(services) !=0:
+                serv_graph_bar = visualize_services(services)
+                context['analysis']['serv_graph_bar'] = serv_graph_bar
 
             if len(top_talkers) != 0:
                 band_util_hbar = visualize_top_talkers(top_talkers)

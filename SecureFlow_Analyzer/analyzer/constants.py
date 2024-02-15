@@ -60,7 +60,6 @@ VULN_PORT_NUMS = {
     513: 'login',
     514: 'cmd',
     873: 'rsync',
-    53: 'domain',
     111: 'sunrpc',
     2049: 'nfsd',
     135: 'epmap',

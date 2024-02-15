@@ -5,28 +5,19 @@
 <div class="container-fluid">
   <!-- 1st Headings Row -->
   <div class="row">
-    <div class="col-8">
+    <div class="col-4">
       <h2 class="text-center p-2">Protocol Distribution</h2>
     </div>
-    <div class="col">
+    <div class="col-4">
+      <h2 class="text-center p-2">Service Distribution</h2>
+    </div>
+    <div class="col-4">
       <h2 class="text-center p-2">Bandwidth Utilization</h2>
     </div>
   </div>
   <!-- 1st Charts Row -->
   <div class="row">
     <div class="col-4">
-      <div class="shadow">
-        {% if proto_graph_bar %} {{ proto_graph_bar|safe }} {% else %}
-        <p>No graph was provided.</p>
-        {% endif %}
-      </div>
-      <figcaption class="figure-caption text-center"
-        ><em
-          ><u>Bar</u> chart depicting number of occurences per protocol.</em
-        ></figcaption
-      >
-    </div>
-    <div class="col-4 vertical-separation">
       <div class="shadow">
         {% if proto_graph_pie %} {{ proto_graph_pie|safe }} {% else %}
         <p>No graph was provided.</p>
@@ -35,6 +26,20 @@
       <figcaption class="figure-caption text-center"
         ><em
           ><u>Pie</u> chart depicting number of occurences per protocol.</em
+        ></figcaption
+      >
+    </div>
+    <div class="col-4 vertical-separation">
+      <div class="shadow">
+        {% if serv_graph_bar %} {{ serv_graph_bar|safe }} {% else %}
+        <p>No graph was provided.</p>
+        {% endif %}
+      </div>
+      <figcaption class="figure-caption text-center"
+        ><em
+          ><u>Bar</u> chart depicting number of occurences per service.
+          <br />Port numbers which do not have a set service are marked as
+          <strong>Unresolved</strong></em
         ></figcaption
       >
     </div>
