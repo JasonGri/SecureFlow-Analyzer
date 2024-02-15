@@ -87,8 +87,13 @@ const convTable = new DataTable("#conversations-table", {
   ],
 });
 
-// Chart surrounding space
-//TODO: Make it round
+// Results elapsed time
+const timeElapsed = document.getElementById("time-elapsed");
+
+console.log(parseFloat(timeElapsed.textContent) * 1000);
+timeElapsed.textContent = formatDuration(
+  parseFloat(timeElapsed.textContent) * 1000
+);
 
 // VULNERABLE SERVICES
 const serviceBtns = document.querySelectorAll(".service-btn");

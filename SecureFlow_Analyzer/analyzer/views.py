@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 
 import concurrent.futures
-import json
+import time
 
 from .forms import PcapFileForm
 from .logic import *
@@ -29,6 +29,7 @@ def index(req):
         
 
             #TODO: Run analysis and assign results to context
+            start_time = time.time()
             protocols = get_protocols(capture)
             services = get_services(capture)
             convos = get_convos(capture)
@@ -101,7 +102,9 @@ def index(req):
             generate_alerts(scans, scan_alerts)
 
             context['anomaly']['scan_alerts'] = scan_alerts
+            end_time = time.time()
 
+            context['time_elapsed'] = end_time - start_time
             #Sets context in session for transfer to other views
             req.session['context'] = context
 
@@ -113,7 +116,10 @@ def index(req):
     return render(req, 'analyzer/index.html', {'form': form})
 
 def results(req):
-    return render(req, "analyzer/results.html")
+
+    context = req.session['context']
+
+    return render(req, "analyzer/results.html", context)
 
 def analysis(req):
 

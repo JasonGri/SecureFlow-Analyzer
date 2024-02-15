@@ -1,6 +1,6 @@
 {% extends "analyzer/base.html" %} {% load static %} {% block body %}
 <h1 class="text-center">Analysis Complete!</h1>
-<div class="d-grid gap-2 col-6 mx-auto">
+<div class="d-grid gap-2 col-6 mx-auto mt-4">
   <a class="btn btn-dark" href="{% url 'analyzer:analysis' %}" role="button"
     ><img
       src="{% static 'svgIcons/pie-chart-fill.svg' %}"
@@ -17,5 +17,8 @@
     View Anomalies</a
   >
 </div>
+<h5 class="text-center mt-4"
+  >Processing took: <span id="time-elapsed">{{time_elapsed}}</span></h5
+>
 
 {% endblock %}
