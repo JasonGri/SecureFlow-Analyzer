@@ -166,3 +166,18 @@ hr {
   border-color: var(--body_text);
   border-width: 2px;
 }
+
+/* HTTP Inspection */
+.http-btn {
+  background-color: var(--btn);
+  color: #ffffff;
+}
+
+.http-btn.active {
+  background-color: var(--btn_act);
+  color: var(--body_text);
+}
+
+.http-pkts li {
+  background-color: var(--table_body_bg);
+}

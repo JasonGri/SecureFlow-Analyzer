@@ -189,6 +189,70 @@
       {% endif %}
     </div>
   </div>
+  <hr class="my-5" />
+  <!-- 4th Headings Row -->
+  <div class="row">
+    <div class="col">
+      <h2 class="text-center p-2">HTTP Inspection</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <h3 class="text-center">Packets</h3>
+    </div>
+    <div class="col-8">
+      <h3 class="text-center">Details</h3>
+    </div>
+  </div>
+  <!-- HTTP Inspection -->
+  <div class="row">
+    <div class="col-4 vertical-separation">
+      <ul class="list-group http-pkts shadow">
+        {% for id, entry in http_entries.items %}
+          <li class="list-group-item">
+            <strong>{{forloop.counter}}.</strong>
+            <button
+            class="btn http-btn my-1 shadow"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#http-{{forloop.counter}}"
+            aria-expanded="false"
+            aria-controls="http-{{forloop.counter}}"
+            > {{id}}</button
+          >
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-8">
+      {% for id, entry in http_entries.items %}
+        <ul class="list-group http-details collapse shadow my-1" id="http-{{forloop.counter}}">
+          <li class="list-group-item"><strong>PACKET: </strong>{{id}}</li>
+          <!-- Get the info -->
+          {% for key, val in entry.info.items %}
+            <li class="list-group-item"><strong>{{key.upper}}: </strong>{{val}}</li>
+          {% endfor %}
+          <!-- Get malicious details -->
+          {% for key, val in entry.mal.items %}
+            {% if val %}
+              {% if key == "agent" %}
+                <li class="list-group-item" style="color:red">
+                  <strong>User-Agent: </strong>
+                  <ul class="list-group d-inline-block">
+                    {% for k, v in val.items %}
+                      <li class="list-group-item"><strong>{{k}}: </strong>{{v}}</li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              {% else %}
+                <li class="list-group-item" style="color:red"><strong>{{key.upper}}: </strong>{{val}}</li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    </div>
+  <hr class="my-5" />
 </div>
 
 {% endblock %}

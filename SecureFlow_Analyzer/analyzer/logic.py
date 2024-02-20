@@ -10,6 +10,7 @@ from scapy.all import *
 from scapy.layers.inet import *
 from scapy.layers.inet6 import *
 from scapy.layers.dns import *
+from scapy.layers.http import *
 
 from collections import Counter
 
@@ -24,6 +25,7 @@ import requests
 from ipaddress import IPv6Address, IPv6Network 
 from itertools import islice
 from decimal import Decimal
+import csv
 
 @timeit
 def get_capture(file_path):
@@ -391,17 +393,16 @@ def get_vuln_services(capture):
     return filtered_serv_dict
 
 #---------------------Malicious Domains------------------
-# Fetch data each time before analysis (UP-TO-DATE)
 @timeit
-def fetch_data(url):
-
-    response = requests.get(url)
-    data = response.text
-
-    return data
+def parse_dom_data(url):
+    data = fetch_data(url)
+    domain_lines = data.strip().split('\n')
+    dom_set = {line.split(' ')[-1] for line in domain_lines} # set for faster iteration
+    
+    return dom_set
 
 @timeit
-def is_dom_suspicious(capture, data):
+def is_dom_suspicious(capture, dom_set):
     '''
     This is a docstring for is_dom_suspicious.
 
@@ -413,9 +414,6 @@ def is_dom_suspicious(capture, data):
     A list comprised of dictionaries with src_ip, dst_ip, domain_name, and datetime of the incident.
     '''
     sus_entries = []
-    # Parse only domain names to a list
-    domain_lines = data.strip().split('\n')
-    dom_lst = [line.split(' ')[-1] for line in domain_lines]
 
     for pkt in capture:
         # Check to see if it is a QUERY
@@ -429,7 +427,7 @@ def is_dom_suspicious(capture, data):
                 domain = pkt[DNSQR].qname.decode('latin-1')[:-1]
 
             # Check if domain is malicious
-            for mal_dom in dom_lst:
+            for mal_dom in dom_set:
                 if domain == mal_dom:
                     timestamp = float(pkt.time)
                     date_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
@@ -814,3 +812,109 @@ def port_scan_detect(time_groups, port_threshold):
         port_scans.pop(id, None)
 
     return port_scans
+
+#---------------------HTTP Inspection-----------------
+@timeit
+def check_agent(file_path, agent):
+
+    with open(os.path.join(settings.STATICFILES_DIRS[0], file_path), newline='') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        
+        for row in csv_reader:
+            if row['http_user_agent'] == agent:
+                return {'name': row['http_user_agent'], 'description':row['metadata_description'], 'category': row['metadata_category'], 'severity': row['metadata_severity']}
+
+    return None
+
+
+def get_path(packet):
+    path = packet[HTTPRequest].Path 
+
+    return path.decode('utf-8', errors='replace')
+
+def get_url(packet):    
+    host = packet[HTTPRequest].Host
+    path = packet[HTTPRequest].Path
+
+    url = host.decode('utf-8', errors='replace') + path.decode('utf-8', errors='replace')
+
+    return url
+
+def get_method(packet):
+    method = packet[HTTPRequest].Method
+
+    return method.decode('utf-8', errors='replace')
+
+def get_agent(packet):
+    agent = packet[HTTPRequest].User_Agent
+    return agent.decode('utf-8', errors='replace')
+
+# Scapy by default only includes ports 80 and 8080 for http
+bind_layers(TCP, HTTP, sport=5000)
+bind_layers(TCP, HTTP, dport=5000)
+bind_layers(TCP, HTTP, sport=8000)
+bind_layers(TCP, HTTP, dport=8000)
+
+@timeit
+def http_inspect(capture, dom_set):
+    # Capture a packet list of all TCP communications
+    tcp_sessions = sniff(offline=capture, session=TCPSession)
+
+    http_entries = {}
+
+    for pkt in tcp_sessions:
+
+        if pkt.haslayer(HTTPRequest):
+
+            # # Prepare neutral entry
+            # entry = {'method':None, 'agent':None, 'url':None, 'file':None, 'creds':None}
+
+            # Gather HTTP info
+            method = get_method(pkt)
+            url = get_url(pkt)
+            agent = get_agent(pkt)
+            path = get_path(pkt)
+
+            entry = {'info':{'method':method, 'agent':agent, 'url':url}, 'mal':{'method':None, 'agent':None, 'url':None, 'file':None, 'credentials':None}}
+
+            # Check for potentially dangerous HTTP Methods
+            if method in SUS_METHODS:
+                entry['mal']['method'] = method
+
+            # Check for malicious user agents
+            entry['mal']['agent'] = check_agent(AGENTS_CSV, agent)
+
+            # Check for malicious domain in URL
+            for dom in dom_set:
+                if dom in url:
+                    entry['mal']['url'] = (dom, url)
+
+            # Check for potentially dangerous file requested
+            for ext in FILE_EXTENSIONS:
+                if ext in path:
+                    # Get file name
+                    file = path[path.rfind('/')+1:]
+                    entry['mal']['file'] = file
+
+            # Check for credentials       
+            if method == 'POST':
+                payload = pkt[Raw].load.decode('utf-8', errors='replace')
+
+                # Username/ Password possibly related keywords
+                keywords = {"uname", "username", "user", "pass", "password", "login", "Email"}
+
+                for keyword in keywords:
+                    if keyword in payload:
+                        # TODO: Provide a more parsed version
+                        entry['mal']['credentials'] = payload
+
+            # If the malicious part of the entry has at least one suspicious value add it to the dict
+            if any(val != None for val in entry['mal'].values()):
+                timestamp = float(pkt.time)
+                socket_pair = f'{pkt[IP].src}:{pkt[TCP].sport}-->{pkt[IP].dst}:{pkt[TCP].dport} at {timestamp}'
+                # Identifier of sockeet pair and timestamp
+                id = socket_pair
+                http_entries[id] = entry
+
+    
+    return http_entries

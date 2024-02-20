@@ -74,7 +74,7 @@ def index(req):
             vuln_services = get_vuln_services(capture)
             context['anomaly']['vuln_services'] = vuln_services
 
-            mal_doms = fetch_data(MALICIOUS_DOMAINS_URL)
+            mal_doms = parse_dom_data(MALICIOUS_DOMAINS_URL)
             sus_dom_entries = is_dom_suspicious(capture, mal_doms)
             context['anomaly']['sus_dom_entries'] = sus_dom_entries
 
@@ -102,8 +102,13 @@ def index(req):
             generate_alerts(scans, scan_alerts)
 
             context['anomaly']['scan_alerts'] = scan_alerts
-            end_time = time.time()
 
+            # HTTP Inspection
+            http_entries = http_inspect(capture, mal_doms)
+            context['anomaly']['http_entries'] = http_entries
+
+
+            end_time = time.time()
             context['time_elapsed'] = end_time - start_time
             #Sets context in session for transfer to other views
             req.session['context'] = context

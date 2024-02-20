@@ -92,3 +92,15 @@ MALICIOUS_DOMAINS_URL = 'https://hole.cert.pl/domains/domains_hosts.txt'
 MALICIOUS_IP_URL = 'https://raw.githubusercontent.com/stamparm/ipsum/master/levels/1.txt'
 
 MALICIOUS_IPV6_URL = 'https://www.spamhaus.org/drop/dropv6.txt'
+
+
+# Methods potentially used for malicious purposes
+SUS_METHODS = {'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT'}
+
+# Known malicious user agents
+AGENTS_CSV = 'suspicious_http_user_agents_list.csv'
+
+# Potentially dangerous file extensions
+FILE_EXTENSIONS = {
+    '.docm', '.dotm', '.xlsm', '.xltm', '.xlam', '.pptm', '.potm', '.ppam', '.ppsm', '.sldm', '.doc', '.xls', '.ppt', '.inf', '.lnk', '.scf', '.ps1', '.ps1xml', '.ps2', '.ps2xml', '.psc1', '.psc2', '.msh', '.msh1', '.msh2', '.mshxml', '.msh1xml', '.msh2xml', '.wsc', '.wsh', '.ws', '.wsf', '.jse', '.js', '.vbe', '.vb', '.vbs', '.cmd', '.bat', '.gadget', '.msi', '.msp', '.com', '.scr', '.hta', '.cpl', '.msc', '.jar', '.exe', '.pif', '.application'
+}

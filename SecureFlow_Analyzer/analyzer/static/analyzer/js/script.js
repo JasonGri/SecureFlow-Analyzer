@@ -90,10 +90,11 @@ const convTable = new DataTable("#conversations-table", {
 // Results elapsed time
 const timeElapsed = document.getElementById("time-elapsed");
 
-console.log(parseFloat(timeElapsed.textContent) * 1000);
-timeElapsed.textContent = formatDuration(
-  parseFloat(timeElapsed.textContent) * 1000
-);
+if (timeElapsed) {
+  timeElapsed.textContent = formatDuration(
+    parseFloat(timeElapsed.textContent) * 1000
+  );
+}
 
 // VULNERABLE SERVICES
 const serviceBtns = document.querySelectorAll(".service-btn");
@@ -124,5 +125,14 @@ portsBtns.forEach((btn) => {
     } else {
       clickedElement.lastElementChild.src = caretUp;
     }
+  });
+});
+
+// HTTP Inspection
+const httpBtns = document.querySelectorAll(".http-btn");
+
+httpBtns.forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.target.classList.toggle("active");
   });
 });

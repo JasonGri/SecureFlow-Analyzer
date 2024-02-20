@@ -1,4 +1,4 @@
-import time, socket
+import time, socket, requests
 
 # Decorator to measure execution time
 def timeit(f):
@@ -25,3 +25,13 @@ def resolve_service(port):
         return service_name
     except:
         return port
+
+
+# fetch data 
+# Fetch data each time before analysis (UP-TO-DATE)
+def fetch_data(url):
+
+    response = requests.get(url)
+    data = response.text
+
+    return data
