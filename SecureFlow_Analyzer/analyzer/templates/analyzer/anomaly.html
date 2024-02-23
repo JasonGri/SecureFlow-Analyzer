@@ -138,6 +138,9 @@
     <div class="col-6">
       <h2 class="text-center p-2">Port Scanning Attempts</h2>
     </div>
+    <div class="col-6">
+      <h2 class="text-center p-2">Domain Generation Algorithm(DGA) Detection</h2>
+    </div>
   </div>
   <!-- Port Scans -->
   <div class="row">
@@ -184,6 +187,29 @@
             <li class="list-group-item"><strong>Time</strong> Threshold: <u>{{scan_time_thres}} sec</u></li>
             <li class="list-group-item"><strong>Port</strong> Threshold: <u> &gt; {{scan_port_thres}}</u></li>
           </ol>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  <!-- DGA Detection -->
+    <div class="col-6 vertical-separation">
+      <h5>The following entries depict any potenital DGA implementations within the supplied capture file.</h5>
+      {% if not dga_alerts %}
+      <h4 class="positive-results">No DGA implementations detected.</h4>
+      {% else %} 
+      <ul class="list-group d-inline-block m-2" >
+        {% for ip, count in dga_alerts.items %}
+        <li class="list-group-item">Suspicious IP:<strong> {{ip}}</strong> | NXDOMAIN Occurrences: <strong>{{count}}</strong></li>
+        {% endfor %}
+      </ul>
+      <div class="row mt-4 justify-content-center">
+        <div class="col-6 text-center">
+          <h5>The Threshold value considered during analysis is the following: </h5>
+
+          <ul class="list-group mt-2">
+            <li class="list-group-item"><strong>Non Existent Domain error(NXDOMAIN)</strong> Threshold: &gt;<u> {{nxdomain_thres}}</u></li>
+          </ul>
         </div>
       </div>
       {% endif %}
@@ -252,6 +278,7 @@
         </ul>
       {% endfor %}
     </div>
+  </div>
   <hr class="my-5" />
 </div>
 

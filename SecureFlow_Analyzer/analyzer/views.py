@@ -21,6 +21,7 @@ def index(req):
             dos_time_thres = form.cleaned_data['dos_time_thres']
             scan_port_thres = form.cleaned_data['scan_port_thres']
             scan_time_thres = form.cleaned_data['scan_time_thres']
+            nxdomain_thres = form.cleaned_data['nxdomain_thres']
 
             # Extract PacketList from pcap
             with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -50,6 +51,7 @@ def index(req):
                     'dos_time_thres' : dos_time_thres,
                     'scan_port_thres' : scan_port_thres,
                     'scan_time_thres' : scan_time_thres,
+                    'nxdomain_thres': nxdomain_thres
                 }
             }
 
@@ -107,6 +109,9 @@ def index(req):
             http_entries = http_inspect(capture, mal_doms)
             context['anomaly']['http_entries'] = http_entries
 
+            # DGA Detection
+            dga_alerts = detect_dga(capture, nxdomain_thres)
+            context['anomaly']['dga_alerts'] = dga_alerts
 
             end_time = time.time()
             context['time_elapsed'] = end_time - start_time

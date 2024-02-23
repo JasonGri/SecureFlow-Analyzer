@@ -11,3 +11,5 @@ class PcapFileForm(forms.Form):
     scan_port_thres = forms.IntegerField(label="Port Threshold", min_value=0, max_value=65535)
     scan_time_thres = forms.FloatField(label="Time Threshold", min_value=0)
 
+    nxdomain_thres = forms.IntegerField(label="NXDOMAIN Threshold", min_value=1)
+

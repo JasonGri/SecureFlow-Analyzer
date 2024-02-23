@@ -918,3 +918,45 @@ def http_inspect(capture, dom_set):
 
     
     return http_entries
+
+
+#---------------------DGA Detection-----------------
+@timeit
+def detect_dga(capture, nx_threshold):
+    '''
+    This is a docstring for detect_dga.
+
+    Parameters:
+    - capture: The Scapy's PacketList obj from the uploaded PCAP file.
+    - nx_threshold: An integer representing number of nx domains allowed.  
+
+    Returns:
+    A dictionary comprised of IP addresses and theire repsective occurence counts.
+    '''
+    sus_ips_count = Counter()
+    sus_ips_lst = []
+
+    for pkt in capture:
+        if pkt.haslayer(DNS):
+            ip_layer = pkt[IP] if IP in pkt else pkt[IPv6]
+
+            dns_layer = pkt[DNS]
+
+            # Check if its 1. query, 2. response code non-existent domain
+            if dns_layer.qr == 1 and dns_layer.rcode == 3:
+                
+                # Get the IP it attempts to contact
+                dst_ip = ip_layer.dst
+
+                sus_ips_lst.append(dst_ip)
+    
+    sus_ips_count.update(sus_ips_lst)
+
+    sus_ips_dict = {}
+    # Filter IPs base on threshold
+    for ip, count in sus_ips_count.items():
+        if count >= nx_threshold:
+            sus_ips_dict[ip] = count
+
+
+    return sus_ips_dict
