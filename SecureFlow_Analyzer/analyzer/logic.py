@@ -18,12 +18,11 @@ from collections import Counter
 import pandas as pd
 import plotly.express as px
 
+# General
 from datetime import datetime
 import os
 import ipinfo
-import requests
 from ipaddress import IPv6Address, IPv6Network 
-from itertools import islice
 from decimal import Decimal
 import csv
 
@@ -314,7 +313,7 @@ def get_convos(capture):
     return conversations
 
 #--------------------IP GEOLOCATION MAPPING---------------------
-access_token = os.getenv('IP_ACCESS_TKN')
+access_token = "feecfe8b0c116a"
 
 handler = ipinfo.getHandler(access_token)
 
@@ -847,7 +846,8 @@ def get_method(packet):
 
 def get_agent(packet):
     agent = packet[HTTPRequest].User_Agent
-    return agent.decode('utf-8', errors='replace')
+    if agent != None:
+        return agent.decode('utf-8', errors='replace')
 
 # Scapy by default only includes ports 80 and 8080 for http
 bind_layers(TCP, HTTP, sport=5000)
@@ -858,11 +858,11 @@ bind_layers(TCP, HTTP, dport=8000)
 @timeit
 def http_inspect(capture, dom_set):
     # Capture a packet list of all TCP communications
-    tcp_sessions = sniff(offline=capture, session=TCPSession)
+    # tcp_sessions = sniff(offline=capture, session=TCPSession)
 
     http_entries = {}
 
-    for pkt in tcp_sessions:
+    for pkt in capture:
 
         if pkt.haslayer(HTTPRequest):
 
