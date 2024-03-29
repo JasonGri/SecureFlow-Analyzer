@@ -54,7 +54,7 @@ virtual_environment_name\Scripts\activate
 
 ### 2. Clone GitHub Repository
 
-Clone all files using git & change directory to the Django project.
+Clone all files using git navigate in that folder.
 
 ```Bash
 git clone https://github.com/JasonGri/SecureFlow-Analyzer.git
@@ -77,7 +77,10 @@ python3 gen_env.py
 
 ### 5. Apply Django's Migrations
 
+Finally navigate inside Django's root project directory and apply the migrations.
+
 ```Bash
+cd SecureFlow_Analyzer
 python3 manage.py migrate
 ```
 
